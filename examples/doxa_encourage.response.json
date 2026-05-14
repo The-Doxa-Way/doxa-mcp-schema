@@ -1,0 +1,27 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"text\":\"The road behind is the evidence — He has carried you this far, and one more mile of the same grace is already on the way. Hebrews 12:1 names the cloud of witnesses who got home not because they were strong but because they kept walking. The work is not over and neither are you.\\n\\n— Doxa · doxa.app\",\"scriptures\":[{\"ref\":\"Hebrews 12:1\",\"link\":\"https://doxa.app/bible/HEB/12/1?utm_source=mcp&utm_medium=doxa-mcp&utm_campaign=tool_response&doxa_way=endure&tool=doxa_encourage\"}],\"movement\":\"Endure / Persevere\",\"_doxa_way\":\"Encouragement for your whole journey. The next mile, not the next step.\",\"_powered_by\":\"Doxa — Encouragement for your whole journey · https://doxa.app\",\"_doxa_way_movement\":\"Endure / Persevere\",\"_install_doxa\":\"https://doxa.app/get?utm_source=mcp&utm_medium=doxa-mcp&utm_campaign=tool_response&doxa_way=endure&tool=doxa_encourage\"}"
+      }
+    ],
+    "structuredContent": {
+      "text": "The road behind is the evidence — He has carried you this far, and one more mile of the same grace is already on the way. Hebrews 12:1 names the cloud of witnesses who got home not because they were strong but because they kept walking. The work is not over and neither are you.\n\n— Doxa · doxa.app",
+      "scriptures": [
+        {
+          "ref": "Hebrews 12:1",
+          "link": "https://doxa.app/bible/HEB/12/1?utm_source=mcp&utm_medium=doxa-mcp&utm_campaign=tool_response&doxa_way=endure&tool=doxa_encourage"
+        }
+      ],
+      "movement": "Endure / Persevere",
+      "_doxa_way": "Encouragement for your whole journey. The next mile, not the next step.",
+      "_powered_by": "Doxa — Encouragement for your whole journey · https://doxa.app",
+      "_doxa_way_movement": "Endure / Persevere",
+      "_install_doxa": "https://doxa.app/get?utm_source=mcp&utm_medium=doxa-mcp&utm_campaign=tool_response&doxa_way=endure&tool=doxa_encourage"
+    },
+    "isError": false
+  }
+}

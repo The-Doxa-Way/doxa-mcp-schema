@@ -1,0 +1,18 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "structuredContent": {
+      "reference": "John 14:6",
+      "text": "Jesus answered, \"I am the way and the truth and the life. No one comes to the Father except through me.\" (John 14:6, BSB)\n\n— Doxa · doxa.app",
+      "text_raw": "Jesus answered, \"I am the way and the truth and the life. No one comes to the Father except through me.\"",
+      "translation": "BSB",
+      "link": "https://doxa.app/bible/JHN/14/6?utm_source=mcp&utm_medium=doxa-mcp&utm_campaign=tool_response&tool=doxa_scripture",
+      "related": [],
+      "_powered_by": "Doxa — Encouragement for your whole journey · https://doxa.app",
+      "_doxa_way_movement": "Remember",
+      "_install_doxa": "https://doxa.app/get?utm_source=mcp&utm_medium=doxa-mcp&utm_campaign=tool_response&tool=doxa_scripture"
+    },
+    "isError": false
+  }
+}

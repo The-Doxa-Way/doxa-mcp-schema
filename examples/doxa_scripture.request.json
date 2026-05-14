@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "doxa_scripture",
+    "arguments": {
+      "reference": "John 14:6"
+    }
+  }
+}

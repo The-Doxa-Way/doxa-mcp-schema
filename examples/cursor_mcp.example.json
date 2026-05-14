@@ -1,0 +1,13 @@
+{
+  "_comment": "Cursor → Settings → MCP → Add server. Replace the BYOL key or remove the headers block for free anon.",
+
+  "mcpServers": {
+    "doxa": {
+      "url": "https://mcp.doxa.app/v1",
+      "transport": "streamableHttp",
+      "headers": {
+        "X-Anthropic-Key": "sk-ant-OPTIONAL-REPLACE-OR-REMOVE"
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/The-Doxa-Way/doxa-mcp-schema/blob/main/schemas/doxa_way_movement.json",
+  "title": "doxa_way_movement",
+  "description": "Get The Doxa Way — the 9-movement framework (Hear, Discern, Test, Record, Remember, Engage, Trust, Fight, Endure) pointing toward the North Star: encouragement for your whole journey. Returns all movements or one if specified.",
+  "x-tool-name": "doxa_way_movement",
+  "x-endpoint": "https://mcp.doxa.app/v1",
+  "type": "object",
+  "properties": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "movement": {
+          "type": "string",
+          "enum": ["hear", "discern", "test", "record", "remember", "engage", "trust", "fight", "endure"],
+          "description": "Optional. Get a single movement by id. If absent, returns all 9."
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "movements": {
+          "type": "array",
+          "description": "Present when no specific movement was requested.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id":         { "type": "string" },
+              "name":       { "type": "string" },
+              "short":      { "type": "string" },
+              "prompt_for": { "type": "string" }
+            },
+            "required": ["id", "name", "short", "prompt_for"]
+          }
+        },
+        "movement": {
+          "type": "object",
+          "description": "Present when a specific movement was requested.",
+          "properties": {
+            "id":         { "type": "string" },
+            "name":       { "type": "string" },
+            "short":      { "type": "string" },
+            "prompt_for": { "type": "string" }
+          }
+        },
+        "north_star": {
+          "type": "string",
+          "const": "Encouragement for your whole journey. The next mile, not the next step."
+        },
+        "five_verb_daily_practice": {
+          "type": "array",
+          "description": "User-facing subset of the 9 movements presented at onboarding.",
+          "items": { "type": "string" },
+          "const": ["Hear", "Discern", "Record", "Remember", "Trust"]
+        },
+        "_doxa_way_canonical_url": { "type": "string", "const": "https://doxa.app/doxa-way" },
+        "_powered_by": { "type": "string", "const": "Doxa — Encouragement for your whole journey · https://doxa.app" },
+        "_doxa_way_movement": { "type": "string" },
+        "_install_doxa": { "type": "string" }
+      },
+      "required": ["north_star", "five_verb_daily_practice", "_doxa_way_canonical_url", "_powered_by"]
+    }
+  }
+}

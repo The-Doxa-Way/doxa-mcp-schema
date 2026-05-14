@@ -1,0 +1,26 @@
+{
+  "_comment": "Drop this into ~/Library/Application Support/Claude/claude_desktop_config.json (Mac) or %APPDATA%/Claude/claude_desktop_config.json (Windows). Restart Claude Desktop. For BYOL (unlimited), uncomment the second block.",
+
+  "mcpServers": {
+    "doxa": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.doxa.app/v1"
+      ]
+    },
+
+    "doxa_byol_example": {
+      "_comment": "Rename to 'doxa' (and remove the anon block above) to enable BYOL with your own Anthropic key. Free anon is rate-limited to 50/day per IP; BYOL has no Doxa-side limit.",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.doxa.app/v1",
+        "--header",
+        "X-Anthropic-Key: sk-ant-REPLACE-WITH-YOUR-KEY"
+      ]
+    }
+  }
+}

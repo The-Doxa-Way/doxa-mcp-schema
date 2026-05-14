@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "doxa_encourage",
+    "arguments": {
+      "situation": "I am exhausted and tempted to give up on a long project at work. My friends and family don't really understand what it has cost me.",
+      "movement": "endure"
+    }
+  }
+}

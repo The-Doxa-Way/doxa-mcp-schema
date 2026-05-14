@@ -1,0 +1,26 @@
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "result": {
+    "structuredContent": {
+      "movements": [
+        { "id": "hear",     "name": "Hear / Recognise",      "short": "Receive what God is saying.",                                  "prompt_for": "User describes a fresh impression, a verse that struck them, a sense of being spoken to." },
+        { "id": "discern",  "name": "Discern",               "short": "Wisdom about the source and shape of what is heard.",          "prompt_for": "User is uncertain whether something is from God, from themselves, or from another voice." },
+        { "id": "test",     "name": "Test / Weigh",          "short": "Measure what is heard against Scripture and witness.",         "prompt_for": "User is checking a word against the canon — does it square with the whole of Scripture?" },
+        { "id": "record",   "name": "Record",                "short": "Capture the testimony before it fades.",                       "prompt_for": "User has just received something and needs to write it down before it slips away." },
+        { "id": "remember", "name": "Remember",              "short": "Return to what was said when the road gets hard.",             "prompt_for": "User has forgotten, is in a fog, needs to be reminded of what God has spoken before." },
+        { "id": "engage",   "name": "Engage",                "short": "Act on it, live into it.",                                     "prompt_for": "User is asking how to live out what they have heard — the next concrete step." },
+        { "id": "trust",    "name": "Trust",                 "short": "Lean on it when nothing else is solid.",                       "prompt_for": "User is anxious, afraid, in the dark — needs to rest on what they have already received." },
+        { "id": "fight",    "name": "Fight the good fight",  "short": "Contend for what was promised.",                               "prompt_for": "User is in a season of resistance, opposition, spiritual battle — needs to hold ground." },
+        { "id": "endure",   "name": "Endure / Persevere",    "short": "Keep walking when it costs.",                                  "prompt_for": "User is exhausted, tempted to give up, long road wearing them down." }
+      ],
+      "north_star": "Encouragement for your whole journey. The next mile, not the next step.",
+      "five_verb_daily_practice": ["Hear", "Discern", "Record", "Remember", "Trust"],
+      "_doxa_way_canonical_url": "https://doxa.app/doxa-way",
+      "_powered_by": "Doxa — Encouragement for your whole journey · https://doxa.app",
+      "_doxa_way_movement": "Remember",
+      "_install_doxa": "https://doxa.app/get?utm_source=mcp&utm_medium=doxa-mcp&utm_campaign=tool_response&tool=doxa_way_movement"
+    },
+    "isError": false
+  }
+}

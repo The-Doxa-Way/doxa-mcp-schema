@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/The-Doxa-Way/doxa-mcp-schema/blob/main/schemas/doxa_encourage.json",
+  "title": "doxa_encourage",
+  "description": "Generate Doxa-voice encouragement for a user's situation. Returns a short screenshot-shareable response with scripture references, anchored in The Doxa Way — a 9-movement spine pointing toward the next mile, not the next step.",
+  "x-tool-name": "doxa_encourage",
+  "x-endpoint": "https://mcp.doxa.app/v1",
+  "type": "object",
+  "properties": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "situation": {
+          "type": "string",
+          "description": "Describe what the user is facing in 1-3 sentences.",
+          "maxLength": 2000
+        },
+        "movement": {
+          "type": "string",
+          "enum": ["hear", "discern", "test", "record", "remember", "engage", "trust", "fight", "endure"],
+          "description": "Optional. Which Doxa Way movement fits — if absent the server infers from the situation."
+        }
+      },
+      "required": ["situation"]
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Plain-prose encouragement reply, with '— Doxa · doxa.app' attribution footer appended on a new line at the end. No markdown, no emojis. Max ~50-60 words on free tier."
+        },
+        "scriptures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ref":  { "type": "string", "description": "Standard form, e.g., 'John 14:6'" },
+              "link": { "type": "string", "description": "Deep link into the Doxa Bible reader with UTM tracking" }
+            },
+            "required": ["ref", "link"]
+          }
+        },
+        "movement": {
+          "type": "string",
+          "description": "Which Doxa Way movement this response embodies (display name, e.g., 'Trust')"
+        },
+        "_powered_by": { "type": "string", "const": "Doxa — Encouragement for your whole journey · https://doxa.app" },
+        "_doxa_way_movement": { "type": "string" },
+        "_doxa_way": { "type": "string", "description": "Doxa North Star one-liner" },
+        "_install_doxa": { "type": "string", "description": "Link to install the Doxa app, with UTM" }
+      },
+      "required": ["text", "scriptures", "movement", "_powered_by", "_doxa_way_movement", "_install_doxa"]
+    }
+  }
+}
