@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://doxa.app/doxa-main-logo.png" width="120" alt="Doxa logo" />
+  <img src="https://doxa.app/doxa-logo.png" width="120" alt="Doxa logo" />
 </p>
 
 <h1 align="center">Doxa MCP</h1>
 
 <p align="center">
-  <b>Christian encouragement, Scripture, and discipleship — for every AI agent.</b><br/>
+  <b>Christian encouragement and Scripture — for every AI agent.</b><br/>
   <code>https://doxa.app/mcp/v1</code> · free for everyone · BYOL for unlimited
 </p>
 
@@ -26,7 +26,7 @@
 
 ---
 
-The first [Model Context Protocol](https://modelcontextprotocol.io) server built for Christian encouragement, Bible lookup, and discipleship support. Drop it into [Claude Desktop](https://claude.ai/download), [Cursor](https://cursor.sh), [Cline](https://github.com/cline/cline), or any MCP client and your AI assistant gets [the Doxa voice](https://doxa.app) — edge-case-tested across The Doxa Way (Hear · Discern · Test · Record · Remember · Engage · Trust · Fight · Endure).
+The first [Model Context Protocol](https://modelcontextprotocol.io) server built for Christian encouragement and Bible lookup. Drop it into [Claude Desktop](https://claude.ai/download), [Cursor](https://cursor.sh), [Cline](https://github.com/cline/cline), or any MCP client and your AI assistant gets [the Doxa voice](https://doxa.app) — edge-case-tested across The Doxa Way (Hear · Discern · Test · Record · Remember · Engage · Trust · Fight · Endure).
 
 **Doxa is explicitly *not* an AI companion.** The prompt is hardened against the dangers of AI-companion anthropomorphism — no simulated friendship, no parasocial "I feel for you" tone, no first-person persona. It points users toward Jesus, not toward itself.
 
