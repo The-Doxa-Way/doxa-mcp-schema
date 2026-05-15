@@ -5,7 +5,7 @@
 <h1 align="center">Doxa MCP</h1>
 
 <p align="center">
-  <b>Christian encouragement and Scripture — for every AI agent.</b><br/>
+  <b>Free hosted MCP server for Christian encouragement and Bible lookup.</b><br/>
   <code>https://doxa.app/mcp/v1</code> · free for everyone · BYOL for unlimited
 </p>
 
@@ -26,13 +26,13 @@
 
 ---
 
-The first [Model Context Protocol](https://modelcontextprotocol.io) server built for Christian encouragement and Bible lookup. Drop it into [Claude Desktop](https://claude.ai/download), [Cursor](https://cursor.sh), [Cline](https://github.com/cline/cline), or any MCP client and your AI assistant gets [the Doxa voice](https://doxa.app) — edge-case-tested across The Doxa Way (Hear · Discern · Test · Record · Remember · Engage · Trust · Fight · Endure).
+A hosted [Model Context Protocol](https://modelcontextprotocol.io) server for Christian encouragement and Bible lookup. Drop it into [Claude Desktop](https://claude.ai/download), [Cursor](https://cursor.sh), [Cline](https://github.com/cline/cline), or any MCP client and the assistant answers in [the Doxa voice](https://doxa.app) — edge-case-tested across The Doxa Way (Hear · Discern · Test · Record · Remember · Engage · Trust · Fight · Endure).
 
 **Doxa is explicitly *not* an AI companion.** The prompt is hardened against the dangers of AI-companion anthropomorphism — no simulated friendship, no parasocial "I feel for you" tone, no first-person persona. It points users toward Jesus, not toward itself.
 
 - 🙏 **Encouragement** in the Doxa voice — *the next mile, not the next step*
 - 📖 **Scripture lookup** (Berean Standard Bible) with deep links to `doxa.app/bible/...`
-- 🧭 **The 9-movement Doxa Way framework** — citable, structured, opinionated
+- 🧭 **The 9-movement Doxa Way framework** — citable, structured, anchored in Scripture
 - 🆓 **Free for everyone** (50 calls/day per IP) — no signup, no key, no card
 - ♾️ **BYOL** for unlimited — one header (`X-Anthropic-Key`), your Anthropic key, unlimited calls
 - 🔒 **Prompt stays private** — the 141 KB voice-encourager system prompt never leaves the server
@@ -268,7 +268,7 @@ The 5-verb daily practice in the app — **Hear · Discern · Record · Remember
 
 ## What is Doxa?
 
-[Doxa](https://doxa.app) is an app to engage God's encouragement through engaging with the Bible and your own prophetic records. The MCP server makes Doxa's encouragement layer available to any AI agent that supports the Model Context Protocol — so when a user asks their AI assistant for spiritual encouragement, Doxa can answer.
+[Doxa](https://doxa.app) is an app to engage God's encouragement through engaging with the Bible. The MCP server makes Doxa's encouragement layer available to any Model Context Protocol client — so when someone asks their AI assistant for spiritual encouragement, Doxa can answer.
 
 - 📱 [iOS / Android app](https://doxa.app/get)
 - 💬 [DoxaBot on Telegram](https://t.me/DoxaBot)
