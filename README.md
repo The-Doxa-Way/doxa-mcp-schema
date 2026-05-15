@@ -21,12 +21,14 @@
 <p align="center">
   <a href="https://doxa.app/get">📱 Get the Doxa app</a> ·
   <a href="https://t.me/DoxaBot">💬 DoxaBot on Telegram</a> ·
-  <a href="https://doxa.app/doxa-way">🧭 The Doxa Way</a>
+  <a href="#the-doxa-way--the-9-movements">🧭 The Doxa Way</a>
 </p>
 
 ---
 
-The first [Model Context Protocol](https://modelcontextprotocol.io) server built for Christian encouragement, Bible lookup, and discipleship support. Drop it into [Claude Desktop](https://claude.ai/download), [Cursor](https://cursor.sh), [Cline](https://github.com/cline/cline), or any MCP client and your AI assistant gets [the Doxa voice](https://doxa.app) — production-tested across The Doxa Way (Hear · Discern · Test · Record · Remember · Engage · Trust · Fight · Endure).
+The first [Model Context Protocol](https://modelcontextprotocol.io) server built for Christian encouragement, Bible lookup, and discipleship support. Drop it into [Claude Desktop](https://claude.ai/download), [Cursor](https://cursor.sh), [Cline](https://github.com/cline/cline), or any MCP client and your AI assistant gets [the Doxa voice](https://doxa.app) — edge-case-tested across The Doxa Way (Hear · Discern · Test · Record · Remember · Engage · Trust · Fight · Endure).
+
+**Doxa is explicitly *not* an AI companion.** The prompt is hardened against the dangers of AI-companion anthropomorphism — no simulated friendship, no parasocial "I feel for you" tone, no first-person persona. It points users toward Jesus, not toward itself.
 
 - 🙏 **Encouragement** in the Doxa voice — *the next mile, not the next step*
 - 📖 **Scripture lookup** (Berean Standard Bible) with deep links to `doxa.app/bible/...`
@@ -190,14 +192,14 @@ curl -sX POST https://mcp.doxa.app/v1 \
 |---|---|---|---|
 | Christian voice / encouragement | Build & test yourself | None | ✅ Curated, production-tested |
 | Scripture lookup | Build it | ✅ | ✅ (BSB, modern + free) |
-| Theological framework | Build it | None | ✅ [The Doxa Way](https://doxa.app/doxa-way) |
-| Tone safety (no Christianese, no first-person, no em-dash bait) | Pray | Not applicable | ✅ 141 KB of rules, baked in |
+| **Not an AI companion** (anti-anthropomorphism, no parasocial bond) | Build it yourself — and most don't | Not applicable | ✅ Hard-coded: third-person, no persona, no "I feel for you" — points to Jesus, not itself |
+| Tone safety (no Christianese, no first-person, no em-dash bait) | Pray | Not applicable | ✅ 141 KB of edge-case-tested rules |
 | Setup time | Days to weeks | Hours | **60 seconds** |
 | Hosting | Your infrastructure | Your infrastructure | Hosted (`mcp.doxa.app/v1`) |
 | Cost | Your LLM + your servers | API subscription | **Free** (or BYOL = your LLM only) |
 | Updates | You | Vendor | Continuous from Doxa |
 
-The moat is not the protocol — MCP is open. The moat is **the voice**. Iterating a brand voice in production takes years; you get it as a tool call.
+The protocol is open — MCP itself is a standard. The value is **an edge-case-tested, hardened prompt that points people toward Jesus rather than toward itself.** Iterating that — through safety failures, theology drift, tone collapse, anthropomorphism tests — takes years; you get it as a tool call.
 
 ---
 
@@ -230,17 +232,17 @@ Working request/response fixtures in [`examples/`](./examples).
 
 ---
 
-## Attribution — please leave it on
+## Attribution (required on all free-tier responses)
 
-Every `doxa_encourage` and `doxa_scripture` text response ends with a single-line footer:
+Every `doxa_encourage` and `doxa_scripture` text response ends with a single-line footer that **must remain visible to end users**:
 
 ```
 — Doxa · doxa.app
 ```
 
-The structured response also includes `_powered_by`, `_doxa_way_movement`, and `_install_doxa` metadata, plus scripture references that deep-link to `doxa.app/bible/...`.
+The structured response also includes `_powered_by`, `_doxa_way_movement`, and `_install_doxa` metadata, plus scripture references that deep-link to `doxa.app/bible/...`. **All of these are mandatory on the free tier — anonymous *and* BYOL.** The server emits them on every response; integrators should not strip them from what the end user sees.
 
-Doxa is free for everyone (anonymous and BYOL) because the attribution *is* the marketing. **If your integration needs to strip the footer** (white-label, B2B), email `garth@doxa.app` — a paid white-label tier is on the roadmap and we're talking to first customers now.
+The free tier is free because the attribution *is* the marketing. **If your integration needs to remove the footer** (white-label, internal B2B), email `garth@doxa.app` — a paid white-label tier is on the roadmap and we're talking to first customers now.
 
 ---
 
@@ -261,8 +263,6 @@ Doxa is anchored in a 9-movement spine that maps a sustained walk with God:
 **North Star:** *Encouragement for your whole journey.* Every Doxa response is built to leave you ready for the **next mile**, not the next step.
 
 The 5-verb daily practice in the app — **Hear · Discern · Record · Remember · Trust** — is the entry path into the same framework.
-
-Canonical reference at [doxa.app/doxa-way](https://doxa.app/doxa-way).
 
 ---
 
@@ -300,17 +300,6 @@ Canonical reference at [doxa.app/doxa-way](https://doxa.app/doxa-way).
 - ⏳ Directory listings on Anthropic MCP registry, mcp.so, smithery.ai
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to suggest features or flag issues.
-
----
-
-## Citation
-
-If you cite The Doxa Way in academic / theological writing or in another AI product, please use:
-
-```
-The Doxa Way. (Doxa, 2025-present). Encouragement for your whole journey.
-https://doxa.app/doxa-way
-```
 
 ---
 
