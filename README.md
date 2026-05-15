@@ -171,16 +171,16 @@ curl -sX POST https://doxa.app/mcp/v1 \
 **Developers building:**
 
 - Christian / faith-focused apps (devotional, journaling, prayer, Bible study)
-- Counseling, care, and pastoral platforms
+- Counseling, care, and pastoral platforms that want the tech to point peope to real relationships and Jesus
 - Church and ministry management tools
 - AI assistants and agents with a Christian audience
 - Personal AI workflows in Claude Desktop, Cursor, Cline
 
 **Ministries and creators:**
 
-- Telegram / WhatsApp / Discord bots with real spiritual depth (not generic AI Christian-ese)
+- Telegram / WhatsApp / Discord bots with real spiritual depth (not generic AI Christian-ese that are more similar to chatgpt than sound theology)
 - Newsletter generators, devotional writers, content pipelines
-- Internal AI tools where the voice matters
+- Internal AI tools where the grace and truth matters
 
 **Anyone who has tried** to prompt-engineer a "Christian chatbot" and discovered just how easy it is to get tone, theology, or scripture handling wrong. The Doxa MCP gives you a vetted, production-tested voice for the cost of one HTTP header.
 
@@ -253,8 +253,8 @@ Doxa is anchored in a 9-movement spine that maps a sustained walk with God:
 1. **Hear / Recognise** — receive what God is saying
 2. **Discern** — wisdom about its source and shape
 3. **Test / Weigh** — measure it against Scripture and witness
-4. **Record** — capture the testimony before it fades
-5. **Remember** — return to what was said when the road gets hard
+4. **Record** — capture what God said or did before it fades
+5. **Remember** — return to God's encouragement when the road gets hard
 6. **Engage** — act on it, live into it
 7. **Trust** — lean on it when nothing else is solid
 8. **Fight the good fight** — contend for what was promised
