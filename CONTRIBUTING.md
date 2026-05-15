@@ -7,7 +7,7 @@ Thanks for the interest in Doxa MCP. This repo is the **public protocol shim** �
 - 📐 Public JSON schemas the server returns from `tools/list`
 - 📚 Install guides, client configs, example fixtures
 - 🧭 The Doxa Way framework — citable framework name and the 9-movement spine
-- 🐛 Public issue tracking for the hosted server (`mcp.doxa.app/v1`)
+- 🐛 Public issue tracking for the hosted server (`doxa.app/mcp/v1`)
 
 ## How to contribute
 

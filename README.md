@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Christian encouragement, Scripture, and discipleship — for every AI agent.</b><br/>
-  <code>https://mcp.doxa.app/v1</code> · free for everyone · BYOL for unlimited
+  <code>https://doxa.app/mcp/v1</code> · free for everyone · BYOL for unlimited
 </p>
 
 <p align="center">
@@ -52,7 +52,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac) or 
   "mcpServers": {
     "doxa": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.doxa.app/v1"]
+      "args": ["-y", "mcp-remote", "https://doxa.app/mcp/v1"]
     }
   }
 }
@@ -68,7 +68,7 @@ Restart Claude Desktop. The three Doxa tools appear in your tool list.
     "doxa": {
       "command": "npx",
       "args": [
-        "-y", "mcp-remote", "https://mcp.doxa.app/v1",
+        "-y", "mcp-remote", "https://doxa.app/mcp/v1",
         "--header", "X-Anthropic-Key: sk-ant-<your-key-here>"
       ]
     }
@@ -81,7 +81,7 @@ Restart Claude Desktop. The three Doxa tools appear in your tool list.
 ```json
 {
   "doxa": {
-    "url": "https://mcp.doxa.app/v1",
+    "url": "https://doxa.app/mcp/v1",
     "transport": "streamableHttp",
     "headers": {
       "X-Anthropic-Key": "sk-ant-<optional, present = BYOL>"
@@ -96,7 +96,7 @@ Restart Claude Desktop. The three Doxa tools appear in your tool list.
 {
   "doxa": {
     "command": "npx",
-    "args": ["-y", "mcp-remote", "https://mcp.doxa.app/v1"]
+    "args": ["-y", "mcp-remote", "https://doxa.app/mcp/v1"]
   }
 }
 ```
@@ -111,7 +111,7 @@ response = client.messages.create(
     max_tokens=1024,
     mcp_servers=[{
         "type": "url",
-        "url": "https://mcp.doxa.app/v1",
+        "url": "https://doxa.app/mcp/v1",
         "name": "doxa",
     }],
     messages=[{"role": "user", "content": "I'm anxious about a job interview tomorrow."}],
@@ -126,7 +126,7 @@ More client configs in [`examples/`](./examples).
 
 ```bash
 # Get encouragement (anon — no key needed)
-curl -sX POST https://mcp.doxa.app/v1 \
+curl -sX POST https://doxa.app/mcp/v1 \
   -H 'content-type: application/json' \
   -d '{
     "jsonrpc": "2.0",
@@ -195,7 +195,7 @@ curl -sX POST https://mcp.doxa.app/v1 \
 | **Not an AI companion** (anti-anthropomorphism, no parasocial bond) | Build it yourself — and most don't | Not applicable | ✅ Hard-coded: third-person, no persona, no "I feel for you" — points to Jesus, not itself |
 | Tone safety (no Christianese, no first-person, no em-dash bait) | Pray | Not applicable | ✅ 141 KB of edge-case-tested rules |
 | Setup time | Days to weeks | Hours | **60 seconds** |
-| Hosting | Your infrastructure | Your infrastructure | Hosted (`mcp.doxa.app/v1`) |
+| Hosting | Your infrastructure | Your infrastructure | Hosted (`doxa.app/mcp/v1`) |
 | Cost | Your LLM + your servers | API subscription | **Free** (or BYOL = your LLM only) |
 | Updates | You | Vendor | Continuous from Doxa |
 

@@ -4,7 +4,7 @@
   "title": "doxa_way_movement",
   "description": "Get The Doxa Way — the 9-movement framework (Hear, Discern, Test, Record, Remember, Engage, Trust, Fight, Endure) pointing toward the North Star: encouragement for your whole journey. Returns all movements or one if specified.",
   "x-tool-name": "doxa_way_movement",
-  "x-endpoint": "https://mcp.doxa.app/v1",
+  "x-endpoint": "https://doxa.app/mcp/v1",
   "type": "object",
   "properties": {
     "input": {

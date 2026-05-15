@@ -1,6 +1,6 @@
 # Examples
 
-Real request / response fixtures for the Doxa MCP server at `https://mcp.doxa.app/v1`. Use as references for client implementations or as test fixtures.
+Real request / response fixtures for the Doxa MCP server at `https://doxa.app/mcp/v1`. Use as references for client implementations or as test fixtures.
 
 ## Tool fixtures
 
@@ -24,7 +24,7 @@ Both show free-anon and BYOL variants.
 ## Sanity-check a fixture against the live server
 
 ```bash
-curl -sX POST https://mcp.doxa.app/v1 \
+curl -sX POST https://doxa.app/mcp/v1 \
   -H 'content-type: application/json' \
   --data @doxa_encourage.request.json | jq
 ```

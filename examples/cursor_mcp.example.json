@@ -3,7 +3,7 @@
 
   "mcpServers": {
     "doxa": {
-      "url": "https://mcp.doxa.app/v1",
+      "url": "https://doxa.app/mcp/v1",
       "transport": "streamableHttp",
       "headers": {
         "X-Anthropic-Key": "sk-ant-OPTIONAL-REPLACE-OR-REMOVE"

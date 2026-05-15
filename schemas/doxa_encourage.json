@@ -4,7 +4,7 @@
   "title": "doxa_encourage",
   "description": "Generate Doxa-voice encouragement for a user's situation. Returns a short screenshot-shareable response with scripture references, anchored in The Doxa Way — a 9-movement spine pointing toward the next mile, not the next step.",
   "x-tool-name": "doxa_encourage",
-  "x-endpoint": "https://mcp.doxa.app/v1",
+  "x-endpoint": "https://doxa.app/mcp/v1",
   "type": "object",
   "properties": {
     "input": {
