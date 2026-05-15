@@ -19,8 +19,8 @@
 </p>
 
 <p align="center">
-  <a href="https://doxa.app/get">📱 Get the Doxa app</a> ·
-  <a href="https://t.me/DoxaBot">💬 DoxaBot on Telegram</a> ·
+  <a href="https://doxa.app">📱 Get the Doxa app</a> ·
+  <a href="https://t.me/TheDoxaWayBot">💬 DoxaBot on Telegram</a> ·
   <a href="#the-doxa-way--the-9-movements">🧭 The Doxa Way</a>
 </p>
 
@@ -32,7 +32,7 @@ A hosted [Model Context Protocol](https://modelcontextprotocol.io) server for Ch
 
 - 🙏 **Encouragement** in the Doxa voice — *the next mile, not the next step*
 - 📖 **Scripture lookup** (Berean Standard Bible) with deep links to `doxa.app/bible/...`
-- 🧭 **The 9-movement Doxa Way framework** — citable, structured, anchored in Scripture
+- 🧭 **The Doxa Way framework** (9-movement spine) — citable, structured, anchored in Scripture
 - 🆓 **Free for everyone** (50 calls/day per IP) — no signup, no key, no card
 - ♾️ **BYOL** for unlimited — one header (`X-Anthropic-Key`), your Anthropic key, unlimited calls
 - 🔒 **Prompt stays private** — the 141 KB voice-encourager system prompt never leaves the server
@@ -158,7 +158,7 @@ curl -sX POST https://doxa.app/mcp/v1 \
       "_doxa_way": "Encouragement for your whole journey. The next mile, not the next step.",
       "_powered_by": "Doxa — Encouragement for your whole journey · https://doxa.app",
       "_doxa_way_movement": "Endure / Persevere",
-      "_install_doxa": "https://doxa.app/get?utm_source=mcp&doxa_way=endure&tool=doxa_encourage"
+      "_install_doxa": "https://doxa.app?utm_source=mcp&doxa_way=endure&tool=doxa_encourage"
     }
   }
 }
@@ -207,9 +207,9 @@ The protocol is open — MCP itself is a standard. The value is **an edge-case-t
 
 | Tool | Purpose | Schema |
 |---|---|---|
-| [`doxa_encourage`](./schemas/doxa_encourage.json) | Generate Doxa-voice encouragement for a user's situation. Returns text + extracted scripture refs + which Doxa Way movement it embodies. | `{ situation: string, movement?: "hear"\|"discern"\|...\|"endure" }` |
+| [`doxa_encourage`](./schemas/doxa_encourage.json) | Generate Doxa-voice encouragement for a user's situation. Returns text + extracted scripture refs + which movement of The Doxa Way it embodies. | `{ situation: string, movement?: "hear"\|"discern"\|...\|"endure" }` |
 | [`doxa_scripture`](./schemas/doxa_scripture.json) | Look up a Bible verse with a deep-link into the Doxa Bible reader. BSB by default. | `{ reference: "John 14:6" }` |
-| [`doxa_way_movement`](./schemas/doxa_way_movement.json) | The 9-movement Doxa Way framework. All 9 or one by id. Static; LLM-free. | `{ movement?: "endure" }` |
+| [`doxa_way_movement`](./schemas/doxa_way_movement.json) | The Doxa Way framework (9 movements). All 9 or one by id. Static; LLM-free. | `{ movement?: "endure" }` |
 
 Free anon: 250-token cap on `doxa_encourage`. BYOL: 1500.
 
@@ -270,8 +270,8 @@ The 5-verb daily practice in the app — **Hear · Discern · Record · Remember
 
 [Doxa](https://doxa.app) is an app to engage God's encouragement through engaging with the Bible. The MCP server makes Doxa's encouragement layer available to any Model Context Protocol client — so when someone asks their AI assistant for spiritual encouragement, Doxa can answer.
 
-- 📱 [iOS / Android app](https://doxa.app/get)
-- 💬 [DoxaBot on Telegram](https://t.me/DoxaBot)
+- 📱 [iOS / Android app](https://doxa.app)
+- 💬 [DoxaBot on Telegram](https://t.me/TheDoxaWayBot)
 - 📡 **Doxa MCP** (this server)
 - 🌐 [doxa.app](https://doxa.app)
 
@@ -307,7 +307,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to suggest features or flag iss
 
 The contents of this repository (schemas, docs, examples) are **MIT licensed** — copy them, fork them, integrate freely.
 
-The hosted server, the encouragement system prompt, the brand voice, and the Doxa Way framework name are © Doxa and **not** licensed under MIT — those are Doxa's; this repo is the public protocol shim.
+The hosted server, the encouragement system prompt, the brand voice, and the name "The Doxa Way" are © Doxa and **not** licensed under MIT — those are Doxa's; this repo is the public protocol shim.
 
 ---
 

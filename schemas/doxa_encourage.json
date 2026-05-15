@@ -18,7 +18,7 @@
         "movement": {
           "type": "string",
           "enum": ["hear", "discern", "test", "record", "remember", "engage", "trust", "fight", "endure"],
-          "description": "Optional. Which Doxa Way movement fits — if absent the server infers from the situation."
+          "description": "Optional. Which movement of The Doxa Way fits — if absent the server infers from the situation."
         }
       },
       "required": ["situation"]
@@ -43,7 +43,7 @@
         },
         "movement": {
           "type": "string",
-          "description": "Which Doxa Way movement this response embodies (display name, e.g., 'Trust')"
+          "description": "Which movement of The Doxa Way this response embodies (display name, e.g., 'Trust')"
         },
         "_powered_by": { "type": "string", "const": "Doxa — Encouragement for your whole journey · https://doxa.app" },
         "_doxa_way_movement": { "type": "string" },

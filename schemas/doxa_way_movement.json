@@ -54,7 +54,7 @@
           "items": { "type": "string" },
           "const": ["Hear", "Discern", "Record", "Remember", "Trust"]
         },
-        "_doxa_way_canonical_url": { "type": "string", "const": "https://doxa.app/doxa-way" },
+        "_doxa_way_canonical_url": { "type": "string", "const": "https://doxa.app/mcp" },
         "_powered_by": { "type": "string", "const": "Doxa — Encouragement for your whole journey · https://doxa.app" },
         "_doxa_way_movement": { "type": "string" },
         "_install_doxa": { "type": "string" }

@@ -16,10 +16,10 @@
       ],
       "north_star": "Encouragement for your whole journey. The next mile, not the next step.",
       "five_verb_daily_practice": ["Hear", "Discern", "Record", "Remember", "Trust"],
-      "_doxa_way_canonical_url": "https://doxa.app/doxa-way",
+      "_doxa_way_canonical_url": "https://doxa.app/mcp",
       "_powered_by": "Doxa — Encouragement for your whole journey · https://doxa.app",
       "_doxa_way_movement": "Remember",
-      "_install_doxa": "https://doxa.app/get?utm_source=mcp&utm_medium=doxa-mcp&utm_campaign=tool_response&tool=doxa_way_movement"
+      "_install_doxa": "https://doxa.app?utm_source=mcp&utm_medium=doxa-mcp&utm_campaign=tool_response&tool=doxa_way_movement"
     },
     "isError": false
   }
