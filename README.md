@@ -268,7 +268,7 @@ The 5-verb daily practice in the app — **Hear · Discern · Record · Remember
 
 ## What is Doxa?
 
-[Doxa](https://doxa.app) is a Christian app for daily encouragement, Scripture reading, prayer, and discipleship. The MCP server makes Doxa's encouragement layer available to any AI agent that supports the Model Context Protocol — so when a user asks their AI assistant for spiritual encouragement, Doxa can answer in its own voice.
+[Doxa](https://doxa.app) is an app to engage God's encouragement through engaging with the Bible and your own prophetic records. The MCP server makes Doxa's encouragement layer available to any AI agent that supports the Model Context Protocol — so when a user asks their AI assistant for spiritual encouragement, Doxa can answer.
 
 - 📱 [iOS / Android app](https://doxa.app/get)
 - 💬 [DoxaBot on Telegram](https://t.me/DoxaBot)
