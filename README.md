@@ -242,7 +242,7 @@ Every `doxa_encourage` and `doxa_scripture` text response ends with a single-lin
 
 The structured response also includes `_powered_by`, `_doxa_way_movement`, and `_install_doxa` metadata, plus scripture references that deep-link to `doxa.app/bible/...`. **All of these are mandatory on the free tier — anonymous *and* BYOL.** The server emits them on every response; integrators should not strip them from what the end user sees.
 
-The free tier is free because the attribution *is* the marketing. **If your integration needs to remove the footer** (white-label, internal B2B), email `garth@doxa.app` — a paid white-label tier is on the roadmap and we're talking to first customers now.
+The free tier is free because we want everyone to be able to engage God's encouragement, regardless of budget. The attribution stays so people know where the voice came from and can find Doxa themselves. **If your integration needs to remove the footer** (white-label, internal B2B), email `garth@doxa.app` — a paid white-label tier is on the roadmap.
 
 ---
 
