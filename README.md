@@ -283,6 +283,8 @@ The 5-verb daily practice in the app — **Hear · Discern · Record · Remember
 - **BYOL keys are never persisted.** When you pass `X-Anthropic-Key`, we use it for that one request and discard it.
 - The 141 KB voice-encourager system prompt is private and never returned to clients. Only the model's reply text + structured metadata.
 - Service runs on Supabase Edge Functions with strict row-level security on the audit log table.
+- Full terms of use: **[doxa.app/mcp/terms](https://doxa.app/mcp/terms)** — covers attribution requirement, rate limits, BYOL key handling, abuse reporting, and what we log.
+- Report abuse: [abuse@doxa.app](mailto:abuse@doxa.app) · Security disclosures: [security@doxa.app](mailto:security@doxa.app)
 
 ---
 
