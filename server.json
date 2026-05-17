@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.The-Doxa-Way/doxa-mcp",
+  "name": "io.github.TheDoxaWay/doxa-mcp",
   "title": "Doxa MCP",
-  "description": "Hosted MCP server for Christian encouragement and Bible lookup. Plug Doxa into Claude Desktop, Cursor, Cline, or any Model Context Protocol client. Free anonymous tier with 50 calls/day per IP; BYOL via X-Anthropic-Key header for unlimited calls. Anchored in The Doxa Way 9-movement framework. Explicitly not an AI companion — third-person voice, no parasocial bond.",
+  "description": "Free hosted MCP server for Christian encouragement and Bible lookup. Not an AI companion.",
   "version": "1.0.0",
   "repository": {
     "url": "https://github.com/The-Doxa-Way/doxa-mcp-schema",
