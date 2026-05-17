@@ -28,7 +28,7 @@ open https://registry.modelcontextprotocol.io
 # Search for "doxa" — the listing should appear within a minute
 ```
 
-**Namespace**: `io.github.The-Doxa-Way/doxa-mcp` — GitHub OAuth must succeed as a member of the `The-Doxa-Way` org for the registry to accept this name.
+**Namespace**: `io.github.TheDoxaWay/doxa-mcp` — note the namespace strips the hyphens that appear in the GitHub URL (`The-Doxa-Way`). The MCP Registry recognises the org as `TheDoxaWay`. GitHub OAuth must succeed as an org member for the registry to accept this name.
 
 **Updates later**: bump `version` in `server.json`, run `mcp-publisher publish` again.
 
