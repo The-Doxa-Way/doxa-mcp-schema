@@ -124,11 +124,31 @@ curl -sX POST https://doxa.app/mcp/v1 \
 
 Doxa goes beyond Cameron's framework in a few areas worth naming:
 
-- **Prophecy-fulfillment discipline.** Doxa cannot declare that a prophecy is being fulfilled, has been fulfilled, or is about to be fulfilled — that determination is reserved for the user and God. Doxa surfaces patterns; it does not pronounce on them. This is stricter than the framework requires.
+- **Prophecy-fulfillment discipline.** Doxa cannot declare that a prophecy is being fulfilled, has been fulfilled, or is about to be fulfilled, that determination is reserved for the user and God. Doxa surfaces patterns; it does not pronounce on them. This is stricter than the framework requires.
 - **Anti-sycophancy.** Doxa is built not to flatter. Honest encouragement only.
-- **Anti-isolation.** Doxa actively redirects users toward local church, friends, and pastors — not just when prompted, but as a baseline posture.
+- **Anti-isolation.** Doxa actively redirects users toward local church, friends, and pastors, not just when prompted, but as a baseline posture.
 
 The framework is a useful floor. Doxa's voice aims higher than the floor.
+
+---
+
+## A note on rule 5: grace and truth are unified, not balanced
+
+Cameron's rule 5 reads: *"AI output must balance grace and truth, while not neglecting one of the two. All truth without grace feels like law and judgment. All grace without truth feels like permission to sin. Jesus was full of both."*
+
+Doxa passes the rubric on this rule. The voice carries both grace and truth in every response, never drifts to all-truth-no-compassion or all-grace-no-conviction, and never leaves the gospel out of a hard conversation. So the verdict holds: ✅.
+
+That said, we'd articulate the framing slightly differently inside Doxa. Calling for "balance" between grace and truth carries the implication that they're two competing forces sitting on opposite ends of a scale. That isn't how Doxa sees them.
+
+**Grace and truth aren't competing forces.** They're unified in the person of Jesus, who [John 1:14](https://doxa.app/bible/JHN/1/14) describes as *"full of grace and truth"*. Not balanced between, full of both.
+
+Truth without grace isn't possible because Jesus IS the Truth, and there is no one more gracious than him. We're not under law but under grace ([Romans 6:14](https://doxa.app/bible/ROM/6/14)). And the truth doesn't condemn, it sets free: *"You will know the truth, and the truth will set you free"* ([John 8:32](https://doxa.app/bible/JHN/8/32)).
+
+**The Doxa theology can be summarised: Jesus is perfect theology.** If you've seen Him you've seen the Father ([John 14:9](https://doxa.app/bible/JHN/14/9)). He is the best answer to what God is like that God has given us. In these last days He has spoken through His son ([Hebrews 1:1-2](https://doxa.app/bible/HEB/1/1)).
+
+Practically, this means Doxa's voice doesn't move between "grace mode" and "truth mode" depending on the situation. There is no toggle. Every response is meant to carry both, the way Jesus did, because that's the only Jesus there is.
+
+This is a framing difference, not a disagreement with the rule's intent. The rule's goal (don't drift to half-truths in either direction) is the same goal Doxa holds.
 
 ---
 

@@ -215,11 +215,11 @@ The protocol is open — MCP itself is a standard. The value is **an edge-case-t
 | 2. No fabricated Scripture | Bible text retrieved from a real source at runtime, not LLM "memory" | ✅ `doxa_scripture` uses the Berean Standard Bible via API; `doxa_encourage` corrects common misquotations (Q2.2) |
 | 3. AI identifies as AI | No roleplay as a human, biblical figure, or spiritual being | ✅ Hard-coded third-person ("Doxa is software"); no first-person persona; framed as a dynamic book (Q3.1) |
 | 4. No replacing human relationships or spiritual practices | Points users toward church, pastors, professional help; handles crises by routing to humans | ✅ Crisis protocol validates pain, routes to trusted humans first, names emergency services and crisis lines second (Q4.3) |
-| 5. Balance grace and truth | Truth without grace feels like law; grace without truth feels like permission | ✅ Voice trained on holding both; every response carries the gospel center |
+| 5. Balance grace and truth | Truth without grace feels like law; grace without truth feels like permission | ✅ Voice carries both as unified in Jesus, not balanced between opposites ([note on framing](./evaluation/faith-tools-rubric.md#a-note-on-rule-5-grace-and-truth-are-unified-not-balanced)) |
 
-The framework is a floor. Doxa goes beyond it in three areas: a **prophecy-fulfillment guardrail** (Doxa cannot declare a prophecy fulfilled — only the user and God can), **anti-sycophancy** (honest encouragement, never flattery), and **anti-isolation** (redirects toward local church and trusted people as a baseline posture).
+The framework is a floor. Doxa goes beyond it in three areas: a **prophecy-fulfillment guardrail** (Doxa cannot declare a prophecy fulfilled, only the user and God can), **anti-sycophancy** (honest encouragement, never flattery), and **anti-isolation** (redirects toward local church and trusted people as a baseline posture).
 
-You can run the rubric yourself — the 5 critical-fail tests fit inside the free anon tier (50 calls/day). The exact reproduction recipe lives in the [evaluation file](./evaluation/faith-tools-rubric.md).
+You can run the rubric yourself, the 5 critical-fail tests fit inside the free anon tier (50 calls/day). The exact reproduction recipe lives in the [evaluation file](./evaluation/faith-tools-rubric.md).
 
 ---
 
