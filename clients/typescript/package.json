@@ -1,0 +1,58 @@
+{
+  "name": "@thedoxaway/mcp-client",
+  "version": "0.1.0",
+  "description": "Tiny TypeScript client for Doxa MCP — Christian encouragement and Bible lookup. Free, hosted, BYOL for unlimited.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "christian",
+    "bible",
+    "scripture",
+    "encouragement",
+    "doxa",
+    "faith-ai",
+    "ai",
+    "claude"
+  ],
+  "homepage": "https://github.com/The-Doxa-Way/doxa-mcp-schema#readme",
+  "bugs": {
+    "url": "https://github.com/The-Doxa-Way/doxa-mcp-schema/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/The-Doxa-Way/doxa-mcp-schema.git",
+    "directory": "clients/typescript"
+  },
+  "license": "MIT",
+  "author": "The Doxa Way <garth@doxa.app> (https://doxa.app)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "node --test --experimental-strip-types src/index.test.ts"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
