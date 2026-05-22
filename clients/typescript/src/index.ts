@@ -35,10 +35,18 @@ export interface DoxaClientOptions {
   endpoint?: string;
   /**
    * Anthropic API key. Pass to opt into BYOL mode (unlimited calls, 1500-token cap,
-   * you pay Anthropic). Without it, falls back to free anon (50 calls/day per IP,
-   * 250-token cap, we pay).
+   * you pay Anthropic). Without it, falls back to free anon (10 calls/day per
+   * individual caller, 250-token cap, we pay).
    */
   anthropicKey?: string;
+  /**
+   * Identifies the individual end-user behind a request so the free tier counts
+   * fairly per-person instead of per-IP. Format: `<surface>:<id>`, lowercase
+   * surface (e.g. `discord`, `slack`, `tg`, `web`), alphanumeric id. Bots
+   * serving many users should use {@link DoxaClient.withCaller} to set this
+   * per-call rather than at client construction.
+   */
+  callerId?: string;
   /** Override the user-agent header sent on requests. */
   userAgent?: string;
   /** Custom fetch implementation. Defaults to global fetch (Node 18+). */
@@ -196,6 +204,7 @@ interface ToolCallRaw {
 export class DoxaClient {
   private readonly endpoint: string;
   private readonly anthropicKey: string | undefined;
+  private readonly callerId: string | undefined;
   private readonly userAgent: string;
   private readonly fetchImpl: typeof fetch;
   private callId: number = 0;
@@ -203,8 +212,31 @@ export class DoxaClient {
   constructor(options: DoxaClientOptions = {}) {
     this.endpoint = options.endpoint ?? DEFAULT_ENDPOINT;
     this.anthropicKey = options.anthropicKey;
+    this.callerId = options.callerId;
     this.userAgent = options.userAgent ?? DEFAULT_USER_AGENT;
     this.fetchImpl = options.fetch ?? globalThis.fetch;
+  }
+
+  /**
+   * Returns a cloned client that identifies the given individual end-user on
+   * every call. Use this in bots that serve many users behind one shared
+   * Anthropic key so each user gets their own daily quota.
+   *
+   * @example
+   * ```ts
+   * const doxa = new DoxaClient();
+   * // In a Discord interaction handler:
+   * const reply = await doxa.withCaller(`discord:${interaction.user.id}`).encourage(situation);
+   * ```
+   */
+  withCaller(callerId: string): DoxaClient {
+    return new DoxaClient({
+      endpoint: this.endpoint,
+      anthropicKey: this.anthropicKey,
+      callerId,
+      userAgent: this.userAgent,
+      fetch: this.fetchImpl,
+    });
   }
 
   /**
@@ -273,6 +305,7 @@ export class DoxaClient {
       'user-agent': this.userAgent,
     };
     if (this.anthropicKey) headers['x-anthropic-key'] = this.anthropicKey;
+    if (this.callerId) headers['x-doxa-caller-id'] = this.callerId;
 
     const res = await this.fetchImpl(this.endpoint, {
       method: 'POST',

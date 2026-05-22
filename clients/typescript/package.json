@@ -1,7 +1,7 @@
 {
   "name": "@thedoxaway/mcp-client",
-  "version": "0.1.0",
-  "description": "Tiny TypeScript client for Doxa MCP — Christian encouragement and Bible lookup. Free, hosted, BYOL for unlimited.",
+  "version": "0.2.0",
+  "description": "Tiny TypeScript client for Doxa MCP. Scripture, summoned. Free, hosted, fair per-individual quota. Drop in your own Anthropic key for unlimited.",
   "keywords": [
     "mcp",
     "model-context-protocol",
