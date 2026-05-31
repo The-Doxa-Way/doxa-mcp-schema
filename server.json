@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.TheDoxaWay/doxa-mcp",
   "title": "Doxa MCP",
-  "description": "Doxa MCP: any question, grace + truth. Bible (BSB), apologetics, faith.tools 5/5.",
-  "version": "1.0.2",
+  "description": "Christian AI for any question, in any season. Bible (BSB), grace + truth. faith.tools 5/5.",
+  "version": "1.0.3",
   "repository": {
     "url": "https://github.com/The-Doxa-Way/doxa-mcp-schema",
     "source": "github"
