@@ -1,18 +1,28 @@
 {
   "name": "@thedoxaway/mcp-client",
-  "version": "0.2.0",
-  "description": "Tiny TypeScript client for Doxa MCP. Scripture, summoned. Free, hosted, fair per-individual quota. Drop in your own Anthropic key for unlimited.",
+  "version": "0.2.3",
+  "description": "Tiny TypeScript client for Doxa MCP. Handles any question with grace and truth: Bible lookup (BSB), Christian encouragement, apologetics, grief, doubt. Voice hardened against AI-companion patterns, sycophancy, and prosperity-gospel framing. Points to Jesus. Works with Claude, Cursor, Cline. Free hosted, BYOL Anthropic for unlimited. Scripture, summoned.",
   "keywords": [
     "mcp",
+    "mcp-server",
+    "mcp-client",
     "model-context-protocol",
     "christian",
+    "christian-ai",
     "bible",
+    "biblical",
     "scripture",
+    "faith",
+    "prayer",
     "encouragement",
+    "theology",
+    "bsb",
+    "claude",
+    "claude-desktop",
+    "cursor",
+    "cline",
     "doxa",
-    "faith-ai",
-    "ai",
-    "claude"
+    "ai"
   ],
   "homepage": "https://github.com/The-Doxa-Way/doxa-mcp-schema#readme",
   "bugs": {

@@ -10,7 +10,7 @@ npm install @thedoxaway/mcp-client
 
 ## What is Doxa MCP?
 
-A free hosted [Model Context Protocol](https://modelcontextprotocol.io) server for Christian encouragement and Bible lookup. Drop it into any MCP client (Claude Desktop, Cursor, Cline) or call it directly from your own agent code.
+A free hosted [Model Context Protocol](https://modelcontextprotocol.io) server with Bible verses and Christian encouragement to pass on. Drop it into any MCP client (Claude Desktop, Cursor, Cline) or call it directly from your own agent code, and the client passes the response on to the people it serves.
 
 **Three tools:**
 
