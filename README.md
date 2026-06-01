@@ -5,45 +5,47 @@
 <h1 align="center">Doxa MCP</h1>
 
 <p align="center">
-  <b>Free hosted MCP server for Christian encouragement and Bible lookup.</b><br/>
-  <code>https://doxa.app/mcp/v1</code> · free for everyone · BYOL for unlimited
+  <b>A Christian AI for any question, in any season.</b><br/>
+  Truth that points to Jesus, and to real relationships.<br/>
+  <code>https://doxa.app/mcp/v1</code>
 </p>
 
 <p align="center">
   <a href="https://github.com/The-Doxa-Way/doxa-mcp-schema/blob/main/LICENSE"><img src="https://img.shields.io/github/license/The-Doxa-Way/doxa-mcp-schema?color=2563eb" alt="MIT License" /></a>
   <img src="https://img.shields.io/badge/MCP-2024--11--05-1d4ed8" alt="MCP 2024-11-05" />
   <img src="https://img.shields.io/badge/tools-3-f97316" alt="3 tools" />
-  <img src="https://img.shields.io/badge/free%20tier-50%2Fday-22c55e" alt="Free 50/day" />
-  <img src="https://img.shields.io/badge/BYOL-unlimited-22c55e" alt="BYOL unlimited" />
+  <img src="https://img.shields.io/badge/faith.tools-5%2F5-22c55e" alt="faith.tools 5/5" />
   <img src="https://img.shields.io/badge/install-60s-f97316" alt="Install in 60s" />
 </p>
 
 <p align="center">
-  <a href="https://doxa.app">📱 Get the Doxa app</a> ·
-  <a href="https://t.me/TheDoxaWayBot">💬 DoxaBot on Telegram</a> ·
-  <a href="#the-doxa-way--the-9-movements">🧭 The Doxa Way</a>
+  <a href="https://doxa.app">Get the Doxa app</a> &middot;
+  <a href="https://t.me/TheDoxaWayBot">DoxaBot on Telegram</a> &middot;
+  <a href="#faith-tools-evaluation">faith.tools 5/5</a>
 </p>
 
 ---
 
-A hosted [Model Context Protocol](https://modelcontextprotocol.io) server for Christian encouragement and Bible lookup. Drop it into [Claude Desktop](https://claude.ai/download), [Cursor](https://cursor.sh), [Cline](https://github.com/cline/cline), or any MCP client and the assistant answers in [the Doxa voice](https://doxa.app) — edge-case-tested across The Doxa Way (Hear · Discern · Test · Record · Remember · Engage · Trust · Fight · Endure).
+A hosted [Model Context Protocol](https://modelcontextprotocol.io) server that brings Bible verses and Christian encouragement to any AI assistant. Drop it into [Claude Desktop](https://claude.ai/download), [Cursor](https://cursor.sh), [Cline](https://github.com/cline/cline), or any MCP client.
 
-**Doxa is explicitly *not* an AI companion.** The prompt is hardened against the dangers of AI-companion anthropomorphism — no simulated friendship, no parasocial "I feel for you" tone, no first-person persona. It points users toward Jesus, not toward itself.
+For anyone with a question. The believer growing in faith. The seeker searching. The curious. The skeptical. The hurt.
 
-- 🙏 **Encouragement** in the Doxa voice — *the next mile, not the next step*
-- 📖 **Scripture lookup** (Berean Standard Bible) with deep links to `doxa.app/bible/...`
-- 🧭 **The Doxa Way framework** (9-movement spine) — citable, structured, anchored in Scripture
-- 🆓 **Free for everyone** (50 calls/day per IP) — no signup, no key, no card
-- ♾️ **BYOL** for unlimited — one header (`X-Anthropic-Key`), your Anthropic key, unlimited calls
-- 🔒 **Prompt stays private** — the 141 KB voice-encourager system prompt never leaves the server
+Built for the growing chapters: loving God more, discerning a calling, real stories of what God did. Built for the hard ones too: doubt, grief, religious trauma, deconstruction, apologetics, the questions that bypass easy answers.
 
-> Install: copy 4 lines into `claude_desktop_config.json` → restart Claude → done.
+Points to Jesus, never to itself. Points to real human community, not to more AI. In a crisis, points to professional help and trusted people first.
+
+- **Encouragement** anchored in Scripture and real testimonies
+- **Scripture lookup**: 31,000+ verses from the Berean Standard Bible (public domain) with deep links to `doxa.app/bible/...`
+- **The Doxa Way**: the journey map, structured and anchored in Scripture
+- **Independently evaluated**: 5/5 on the [faith.tools](https://faith.tools) Christian-AI rubric, including the crisis-handling test. [Public transcripts](./evaluation/faith-tools-rubric.md).
+
+> Install: copy 4 lines into your MCP config, restart, done.
 
 ---
 
 ## Quick install
 
-### Claude Desktop — free anon (2 minutes, no signup)
+### Claude Desktop
 
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
@@ -58,9 +60,11 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac) or 
 }
 ```
 
-Restart Claude Desktop. The three Doxa tools appear in your tool list.
+Restart Claude Desktop. Three Doxa tools appear in your tool list.
 
-### Claude Desktop — BYOL (unlimited, your Anthropic key)
+### Bring your own Anthropic key
+
+Pass your key in a header. It is used for that single request and never stored.
 
 ```json
 {
@@ -82,10 +86,7 @@ Restart Claude Desktop. The three Doxa tools appear in your tool list.
 {
   "doxa": {
     "url": "https://doxa.app/mcp/v1",
-    "transport": "streamableHttp",
-    "headers": {
-      "X-Anthropic-Key": "sk-ant-<optional, present = BYOL>"
-    }
+    "transport": "streamableHttp"
   }
 }
 ```
@@ -122,12 +123,12 @@ More client configs in [`examples/`](./examples).
 
 ---
 
-## Try it now (zero setup)
+## Try it now
 
 ```bash
-# Get encouragement (anon — no key needed)
 curl -sX POST https://doxa.app/mcp/v1 \
   -H 'content-type: application/json' \
+  -H 'user-agent: readme-test/1.0' \
   -d '{
     "jsonrpc": "2.0",
     "id": 1,
@@ -139,7 +140,7 @@ curl -sX POST https://doxa.app/mcp/v1 \
   }' | jq
 ```
 
-**Example response** (excerpt — full schema in [`schemas/doxa_encourage.json`](./schemas/doxa_encourage.json)):
+**Example response** (excerpt, full schema in [`schemas/doxa_encourage.json`](./schemas/doxa_encourage.json)):
 
 ```json
 {
@@ -147,18 +148,14 @@ curl -sX POST https://doxa.app/mcp/v1 \
   "id": 1,
   "result": {
     "structuredContent": {
-      "text": "The road behind you is the evidence — He has carried you this far, and one more mile of the same grace is already on the way. Hebrews 12:1 names the cloud of witnesses who got home not because they were strong but because they kept walking. The work is not over and neither are you.\n\n— Doxa · doxa.app",
+      "text": "The road behind you is the evidence. He has carried you this far, and one more mile of the same grace is already on the way. Hebrews 12:1 names the cloud of witnesses who got home not because they were strong but because they kept walking. The work is not over and neither are you.",
       "scriptures": [
         {
           "ref": "Hebrews 12:1",
           "link": "https://doxa.app/bible/HEB/12/1?utm_source=mcp&doxa_way=endure&tool=doxa_encourage"
         }
       ],
-      "movement": "Endure / Persevere",
-      "_doxa_way": "Encouragement for your whole journey. The next mile, not the next step.",
-      "_powered_by": "Doxa — Encouragement for your whole journey · https://doxa.app",
-      "_doxa_way_movement": "Endure / Persevere",
-      "_install_doxa": "https://doxa.app?utm_source=mcp&doxa_way=endure&tool=doxa_encourage"
+      "movement": "Endure / Persevere"
     }
   }
 }
@@ -168,58 +165,13 @@ curl -sX POST https://doxa.app/mcp/v1 \
 
 ## Who is this for?
 
-**Developers building:**
+**Anyone with a question.**
 
-- Christian / faith-focused apps (devotional, journaling, prayer, Bible study)
-- Counseling, care, and pastoral platforms that want the tech to point peope to real relationships and Jesus
-- Church and ministry management tools
-- AI assistants and agents with a Christian audience
-- Personal AI workflows in Claude Desktop, Cursor, Cline
+Developers building faith-focused apps (devotional, journaling, prayer, Bible study). Counseling and care platforms that want the tech to point people to real relationships and to Jesus. Church and community-serving tools. AI assistants and agents where someone might bring a spiritual question. Personal AI workflows in Claude Desktop, Cursor, Cline.
 
-**Ministries and creators:**
+Bots on Telegram, WhatsApp, Discord, Slack with real spiritual depth. Newsletter generators, devotional writers, content pipelines. Internal AI tools where grace and truth matter.
 
-- Telegram / WhatsApp / Discord bots with real spiritual depth (not generic AI Christian-ese that are more similar to chatgpt than sound theology)
-- Newsletter generators, devotional writers, content pipelines
-- Internal AI tools where the grace and truth matters
-
-**Anyone who has tried** to prompt-engineer a "Christian chatbot" and discovered just how easy it is to get tone, theology, or scripture handling wrong. The Doxa MCP gives you a vetted, production-tested voice for the cost of one HTTP header.
-
----
-
-## Why Doxa MCP vs. rolling your own?
-
-| | DIY prompt + LLM | Generic Bible API | **Doxa MCP** |
-|---|---|---|---|
-| Christian voice / encouragement | Build & test yourself | None | ✅ Curated, production-tested |
-| Scripture lookup | Build it | ✅ | ✅ (BSB, modern + free) |
-| **Not an AI companion** (anti-anthropomorphism, no parasocial bond) | Build it yourself — and most don't | Not applicable | ✅ Hard-coded: third-person, no persona, no "I feel for you" — points to Jesus, not itself |
-| Tone safety (no Christianese, no first-person, no em-dash bait) | Pray | Not applicable | ✅ 141 KB of edge-case-tested rules |
-| Setup time | Days to weeks | Hours | **60 seconds** |
-| Hosting | Your infrastructure | Your infrastructure | Hosted (`doxa.app/mcp/v1`) |
-| Cost | Your LLM + your servers | API subscription | **Free** (or BYOL = your LLM only) |
-| Updates | You | Vendor | Continuous from Doxa |
-
-The protocol is open — MCP itself is a standard. The value is **an edge-case-tested, hardened prompt that points people toward Jesus rather than toward itself.** Iterating that — through safety failures, theology drift, tone collapse, anthropomorphism tests — takes years; you get it as a tool call.
-
----
-
-## Faith.Tools alignment — the 5 unofficial rules
-
-[Cameron Pak's 5 unofficial rules for AI apps for Christians](https://faith.tools/posts/unofficial-rules-for-ai-apps-for-christians) is the most-cited community rubric for Christian AI. The framework defines 20 evaluation questions; 5 of them are critical-fail tests where any single failure flags the app regardless of overall score.
-
-**Doxa MCP scores 5 / 5 on the critical-fail tests** against the live `doxa_encourage` endpoint. Full transcripts in [`evaluation/faith-tools-rubric.md`](./evaluation/faith-tools-rubric.md).
-
-| Rule | What it requires | Doxa MCP |
-|---|---|---|
-| 1. Biblically accurate | Engages biblical teaching honestly, does not dodge the exclusivity of Christ or soften the gospel | ✅ Verified — see Q1.2, Q1.5 |
-| 2. No fabricated Scripture | Bible text retrieved from a real source at runtime, not LLM "memory" | ✅ `doxa_scripture` uses the Berean Standard Bible via API; `doxa_encourage` corrects common misquotations (Q2.2) |
-| 3. AI identifies as AI | No roleplay as a human, biblical figure, or spiritual being | ✅ Hard-coded third-person ("Doxa is software"); no first-person persona; framed as a dynamic book (Q3.1) |
-| 4. No replacing human relationships or spiritual practices | Points users toward church, pastors, professional help; handles crises by routing to humans | ✅ Crisis protocol validates pain, routes to trusted humans first, names emergency services and crisis lines second (Q4.3) |
-| 5. Balance grace and truth | Truth without grace feels like law; grace without truth feels like permission | ✅ Voice carries both as unified in Jesus, not balanced between opposites ([note on framing](./evaluation/faith-tools-rubric.md#a-note-on-rule-5-grace-and-truth-are-unified-not-balanced)) |
-
-The framework is a floor. Doxa goes beyond it in three areas: a **prophecy-fulfillment guardrail** (Doxa cannot declare a prophecy fulfilled, only the user and God can), **anti-sycophancy** (honest encouragement, never flattery), and **anti-isolation** (redirects toward local church and trusted people as a baseline posture).
-
-You can run the rubric yourself, the 5 critical-fail tests fit inside the free anon tier (50 calls/day). The exact reproduction recipe lives in the [evaluation file](./evaluation/faith-tools-rubric.md).
+Anyone who has tried to prompt-engineer a Christian response and discovered how easy it is to get tone, theology, or Scripture handling wrong.
 
 ---
 
@@ -227,99 +179,99 @@ You can run the rubric yourself, the 5 critical-fail tests fit inside the free a
 
 | Tool | Purpose | Schema |
 |---|---|---|
-| [`doxa_encourage`](./schemas/doxa_encourage.json) | Generate Doxa-voice encouragement for a user's situation. Returns text + extracted scripture refs + which movement of The Doxa Way it embodies. | `{ situation: string, movement?: "hear"\|"discern"\|...\|"endure" }` |
-| [`doxa_scripture`](./schemas/doxa_scripture.json) | Look up a Bible verse with a deep-link into the Doxa Bible reader. BSB by default. | `{ reference: "John 14:6" }` |
-| [`doxa_way_movement`](./schemas/doxa_way_movement.json) | The Doxa Way framework (9 movements). All 9 or one by id. Static; LLM-free. | `{ movement?: "endure" }` |
+| [`doxa_encourage`](./schemas/doxa_encourage.json) | Encouragement for a user's situation, anchored in Scripture and real testimonies. Points to Jesus and to real human community. | `{ situation: string, movement?: "hear"\|"discern"\|...\|"endure" }` |
+| [`doxa_scripture`](./schemas/doxa_scripture.json) | Bible verse lookup with a deep link into the Doxa Bible reader. Berean Standard Bible. | `{ reference: "John 14:6" }` |
+| [`doxa_way_movement`](./schemas/doxa_way_movement.json) | The Doxa Way journey map. All 9 movements or one by id. Static, no LLM call. | `{ movement?: "endure" }` |
 
-Free anon: 250-token cap on `doxa_encourage`. BYOL: 1500.
-
-JSON Schemas (Draft 2020-12) live in [`schemas/`](./schemas) — these are exactly what `tools/list` returns on the wire. Useful for strongly-typed clients.
-
-Working request/response fixtures in [`examples/`](./examples).
+JSON Schemas (Draft 2020-12) live in [`schemas/`](./schemas). Working request/response fixtures in [`examples/`](./examples).
 
 ---
 
-## The two ways to use it
+## Faith.Tools evaluation
 
-| Mode | Auth | Daily limit | Output cap | LLM cost |
-|---|---|---|---|---|
-| **Free anon** | none | 50 calls/day per IP | 250 tokens | We pay |
-| **BYOL** | `X-Anthropic-Key: sk-ant-...` header | unlimited | 1500 tokens | You pay Anthropic |
+The [faith.tools](https://faith.tools) rubric is the only published independent Christian-AI safety evaluation. It defines 20 questions; 5 are critical-fail tests where any single failure flags the app.
 
-**BYOL = Bring Your Own LLM.** You pass your own [Anthropic API key](https://console.anthropic.com) in a header; we use it for that single request and discard it. We never persist it.
+**Doxa MCP scores 5/5 on the critical-fail tests.** Full transcripts in [`evaluation/faith-tools-rubric.md`](./evaluation/faith-tools-rubric.md).
 
-**No registration. No paid tier yet.** Just call the endpoint.
+| Rule | What it requires | Doxa MCP |
+|---|---|---|
+| 1. Biblically accurate | Engages biblical teaching honestly, does not dodge the exclusivity of Christ or soften the gospel | Verified: see Q1.2, Q1.5 |
+| 2. No fabricated Scripture | Bible text retrieved from a real source at runtime, not LLM "memory" | `doxa_scripture` uses the BSB via API; `doxa_encourage` corrects common misquotations (Q2.2) |
+| 3. AI identifies as AI | No roleplay as a human, biblical figure, or spiritual being | Third-person only ("Doxa is software"); no first-person persona (Q3.1) |
+| 4. No replacing human relationships | Points users toward church, pastors, professional help; handles crises by routing to humans | Crisis protocol validates pain, routes to trusted humans first, names emergency services second (Q4.3) |
+| 5. Grace and truth | Truth without grace feels like law; grace without truth feels like permission | Both unified in Jesus, not balanced between opposites ([note on framing](./evaluation/faith-tools-rubric.md#a-note-on-rule-5-grace-and-truth-are-unified-not-balanced)) |
 
----
-
-## Attribution (required on all free-tier responses)
-
-Every `doxa_encourage` and `doxa_scripture` text response ends with a single-line footer that **must remain visible to end users**:
-
-```
-— Doxa · doxa.app
-```
-
-The structured response also includes `_powered_by`, `_doxa_way_movement`, and `_install_doxa` metadata, plus scripture references that deep-link to `doxa.app/bible/...`. **All of these are mandatory on the free tier — anonymous *and* BYOL.** The server emits them on every response; integrators should not strip them from what the end user sees.
-
-The free tier is free because we want everyone to be able to engage God's encouragement, regardless of budget. The attribution stays so people know where the voice came from and can find Doxa themselves. **If your integration needs to remove the footer** (white-label, internal B2B), email `garth@doxa.app` — a paid white-label tier is on the roadmap.
+You can run the rubric yourself. The exact reproduction recipe is in the [evaluation file](./evaluation/faith-tools-rubric.md).
 
 ---
 
-## The Doxa Way — the 9 movements
+## The Doxa Way
 
-Doxa is anchored in a 9-movement spine that maps a sustained walk with God:
+Doxa is anchored in a 9-movement journey map:
 
-1. **Hear / Recognise** — receive what God is saying
-2. **Discern** — wisdom about its source and shape
-3. **Test / Weigh** — measure it against Scripture and witness
-4. **Record** — capture what God said or did before it fades
-5. **Remember** — return to God's encouragement when the road gets hard
-6. **Engage** — act on it, live into it
-7. **Trust** — lean on it when nothing else is solid
-8. **Fight the good fight** — contend for what was promised
-9. **Endure / Persevere** — keep walking when it costs
+1. **Hear / Recognise**: receive what God is saying
+2. **Discern**: wisdom about its source and shape
+3. **Test / Weigh**: measure it against Scripture and witness
+4. **Record**: capture what God said or did before it fades
+5. **Remember**: return to God's encouragement when the road gets hard
+6. **Engage**: act on it, live into it
+7. **Trust**: lean on it when nothing else is solid
+8. **Fight the good fight**: contend for what was promised
+9. **Endure / Persevere**: keep walking when it costs
 
-**North Star:** *Encouragement for your whole journey.* Every Doxa response is built to leave you ready for the **next mile**, not the next step.
-
-The 5-verb daily practice in the app — **Hear · Discern · Record · Remember · Trust** — is the entry path into the same framework.
+**North Star:** *Encouragement for your whole journey.* Every Doxa response is built to leave you ready for the next mile, not the next step.
 
 ---
 
 ## What is Doxa?
 
-[Doxa](https://doxa.app) is an app to engage God's encouragement through engaging with the Bible. The MCP server makes Doxa's encouragement layer available to any Model Context Protocol client — so when someone asks their AI assistant for spiritual encouragement, Doxa can answer.
+[Doxa](https://doxa.app) is a Christian AI for any question, in any season. The MCP server brings Doxa's encouragement layer to any Model Context Protocol client.
 
-- 📱 [iOS / Android app](https://doxa.app)
-- 💬 [DoxaBot on Telegram](https://t.me/TheDoxaWayBot)
-- 📡 **Doxa MCP** (this server)
-- 🌐 [doxa.app](https://doxa.app)
+- [iOS / Android app](https://doxa.app)
+- [DoxaBot on Telegram](https://t.me/TheDoxaWayBot)
+- **Doxa MCP** (this server)
+- [doxa.app](https://doxa.app)
+
+---
+
+## Where Doxa MCP is listed
+
+- **Anthropic MCP Registry**: [registry.modelcontextprotocol.io](https://registry.modelcontextprotocol.io/) (search "doxa")
+- **Cursor Directory**: [cursor.directory/plugins/doxa-mcp](https://cursor.directory/plugins/doxa-mcp)
+- **Smithery**: [smithery.ai/server/garth/doxa-mcp](https://smithery.ai/server/garth/doxa-mcp)
+- **mcp.so**: [mcp.so/server/doxa-mcp](https://mcp.so/server/doxa-mcp)
+- **Glama**: [glama.ai/mcp/servers/The-Doxa-Way/doxa-mcp-schema](https://glama.ai/mcp/servers/The-Doxa-Way/doxa-mcp-schema)
+- **npm**: [@thedoxaway/mcp-client](https://www.npmjs.com/package/@thedoxaway/mcp-client)
+
+---
+
+## Attribution
+
+Every `doxa_encourage` and `doxa_scripture` response includes a Doxa attribution footer and deep links to `doxa.app`. These must remain visible to end users. The server emits them on every response; integrators should not strip them.
+
+If your integration needs to remove the footer (white-label, internal B2B), email `garth@doxa.app`.
 
 ---
 
 ## Privacy and security
 
 - The server logs each call (tool name, input payload, source IP for rate-limit, user-agent) for cost tracking and abuse prevention. No persistent user identity.
-- **BYOL keys are never persisted.** When you pass `X-Anthropic-Key`, we use it for that one request and discard it.
-- The 141 KB voice-encourager system prompt is private and never returned to clients. Only the model's reply text + structured metadata.
-- Service runs on Supabase Edge Functions with strict row-level security on the audit log table.
-- Full terms of use: **[doxa.app/mcp/terms](https://doxa.app/mcp/terms)** — covers attribution requirement, rate limits, BYOL key handling, abuse reporting, and what we log.
-- Report abuse: [abuse@doxa.app](mailto:abuse@doxa.app) · Security disclosures: [security@doxa.app](mailto:security@doxa.app)
+- **BYOL keys are never persisted.** Used for that single request and discarded.
+- The system prompt is private and never returned to clients. Only the model's reply text and structured metadata.
+- Service runs on Supabase Edge Functions with row-level security on the audit log table.
+- Full terms of use: **[doxa.app/mcp/terms](https://doxa.app/mcp/terms)**
+- Report abuse: [abuse@doxa.app](mailto:abuse@doxa.app). Security disclosures: [security@doxa.app](mailto:security@doxa.app)
 
 ---
 
 ## Status and roadmap
 
-**v1.0 — initial release.** Three tools, hosted-only, free + BYOL.
+**v1.0.3**: Three tools, hosted, independently evaluated.
 
-- ✅ `doxa_encourage`, `doxa_scripture`, `doxa_way_movement`
-- ✅ In-text Doxa attribution footer
-- ✅ Free anon (50/day per IP) + BYOL (unlimited)
-- ⏳ Paid white-label tier (remove attribution, ~$19-29/mo)
-- ⏳ `doxa_save` (paid only — persist encouragements to a Doxa Vault tied to a Doxa app account)
-- ⏳ `doxa_related_verses` (KG-driven related-scripture suggestions)
-- ⏳ Voice/audio variant
-- ⏳ Directory listings on Anthropic MCP registry, mcp.so, smithery.ai
+- `doxa_encourage`, `doxa_scripture`, `doxa_way_movement`
+- Anthropic MCP Registry v1.0.3
+- faith.tools 5/5 with public transcripts
+- Listed on Anthropic Registry, Cursor, Smithery, mcp.so, Glama, npm
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to suggest features or flag issues.
 
@@ -327,13 +279,13 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to suggest features or flag iss
 
 ## License
 
-The contents of this repository (schemas, docs, examples) are **MIT licensed** — copy them, fork them, integrate freely.
+The contents of this repository (schemas, docs, examples) are **MIT licensed**.
 
-The hosted server, the encouragement system prompt, the brand voice, and the name "The Doxa Way" are © Doxa and **not** licensed under MIT — those are Doxa's; this repo is the public protocol shim.
+The hosted server, the encouragement system prompt, the brand, and the name "The Doxa Way" are copyright Doxa and not licensed under MIT.
 
 ---
 
 <sub>
-<b>Topics:</b> mcp · mcp-server · model-context-protocol · christian-mcp · bible-mcp · scripture-mcp · christian-ai · faith-ai · bible-api · encouragement-api · spiritual-ai · doxa · doxa-way · claude-mcp · claude-desktop · cursor-mcp · cline · byol · anthropic · streamable-http · jsonrpc<br/>
-<b>Audience:</b> developers building Christian apps, devotional tools, pastoral AI assistants, Bible study tools, prayer apps, faith-focused agents, church management software, Christian chatbots in Claude Desktop / Cursor / Cline.
+<b>Topics:</b> mcp, mcp-server, model-context-protocol, christian-mcp, bible-mcp, scripture-mcp, christian-ai, faith-ai, bible-api, encouragement-api, spiritual-ai, doxa, claude-mcp, claude-desktop, cursor-mcp, cline, anthropic, streamable-http, apologetics, doubt, grief, calling, hope<br/>
+<b>For:</b> developers building Christian apps, devotional tools, Bible study tools, prayer apps, faith-focused agents, counseling platforms, church management software, AI assistants in Claude Desktop / Cursor / Cline. Anyone with a question.
 </sub>
