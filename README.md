@@ -20,7 +20,7 @@
 
 <p align="center">
   <a href="https://doxa.app">Get the Doxa app</a> &middot;
-  <a href="https://t.me/TheDoxaWayBot">DoxaBot on Telegram</a> &middot;
+  <a href="https://t.me/TheDoxaWayBot">Doxa on Telegram</a> &middot;
   <a href="#faith-tools-evaluation">faith.tools 5/5</a>
 </p>
 
@@ -228,7 +228,7 @@ Doxa is anchored in a 9-movement journey map:
 [Doxa](https://doxa.app) is a Christian AI for any question, in any season. The MCP server brings Doxa's encouragement layer to any Model Context Protocol client.
 
 - [iOS / Android app](https://doxa.app)
-- [DoxaBot on Telegram](https://t.me/TheDoxaWayBot)
+- [Doxa on Telegram](https://t.me/TheDoxaWayBot)
 - **Doxa MCP** (this server)
 - [doxa.app](https://doxa.app)
 
