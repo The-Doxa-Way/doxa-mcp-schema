@@ -1,0 +1,63 @@
+{
+  "name": "@thedoxaway/mcp-server",
+  "version": "0.1.0",
+  "description": "Local, self-hostable MCP stdio server for Doxa, a Christian AI for any question, in any season. Speaks MCP locally and forwards execution to the hosted Doxa endpoint (BSB Bible lookup, real testimonies, encouragement). Works with Claude, Cursor, Cline, any MCP client.",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "stdio",
+    "christian",
+    "christian-ai",
+    "bible",
+    "scripture",
+    "bsb",
+    "faith",
+    "encouragement",
+    "theology",
+    "claude",
+    "cursor",
+    "cline",
+    "doxa"
+  ],
+  "homepage": "https://github.com/The-Doxa-Way/doxa-mcp-schema#readme",
+  "bugs": {
+    "url": "https://github.com/The-Doxa-Way/doxa-mcp-schema/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/The-Doxa-Way/doxa-mcp-schema.git",
+    "directory": "server"
+  },
+  "license": "MIT",
+  "author": "The Doxa Way <garth@doxa.app> (https://doxa.app)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "doxa-mcp-server": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "sync-tools": "node ./scripts/sync-tools.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
