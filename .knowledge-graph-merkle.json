@@ -1,5 +1,5 @@
 {
-  "merkleRoot": "cea4759598e6a97c2fb1dc74d18ca53b7255641b0f0bbe866f1533d3e1ac8b43",
+  "merkleRoot": "37f2ef23fe21a280db62508b342dc1ef8093909d678a7c4c09a553f04f875d08",
   "observations": [
     {
       "hash": "cea4759598e6a97c2fb1dc74d18ca53b7255641b0f0bbe866f1533d3e1ac8b43",
@@ -17,10 +17,27 @@
         "entityType": "Workflow"
       },
       "timestamp": "2026-08-11T16:37:25.524Z"
+    },
+    {
+      "hash": "d3530f29bbc8d83f6f7dbc5166c5211d054b0894f56209a2046582ca3a68555a",
+      "entityName": "KgMerkleFixesPropagated",
+      "content": "Propagated the 2026-08-11 atomic-write and --type-guard fixes from doxa-cns's canonical knowledge-graph-merkle.js.",
+      "provenance": {
+        "sourceFile": "scripts/knowledge-graph-merkle.js",
+        "lineNumber": 1,
+        "lineRange": null,
+        "fileHash": "7d00562c27646e3c3e72e596b3b89aeaa7c893dd7f3eb6a7d76af269e43d812e",
+        "totalLines": 924,
+        "extractedAt": "2026-08-11T21:04:04.714Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "Fix"
+      },
+      "timestamp": "2026-08-11T21:04:04.714Z"
     }
   ],
   "lastVerified": "2026-08-11T16:50:48.608Z",
   "version": 1,
   "createdAt": "2026-08-11T16:37:19.499Z",
-  "lastModified": "2026-08-11T16:50:48.609Z"
+  "lastModified": "2026-08-11T21:04:04.720Z"
 }
