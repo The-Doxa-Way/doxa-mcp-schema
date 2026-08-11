@@ -12,14 +12,18 @@
 #
 # What counts as CODE (this repo's actual source surfaces — survey-verified
 # 2026-08-11): server/src/**/*.ts, server/scripts/*.mjs,
-# clients/typescript/src/**/*.ts. Deliberately NOT code: JSON schemas
-# (schemas/**), example fixtures (examples/**), docs (README/CONTRIBUTING/
-# PUBLISHING.md), server.json, glama.json — this repo is mostly
+# clients/typescript/src/**/*.ts, and top-level scripts/**/*.{js,mjs,sh} (the
+# doxa-cns CLAUDE.md standing pattern for test-gate.sh explicitly names
+# `scripts/` as a gated code path — this repo's own landing-gate infra under
+# scripts/ is not exempt from its own rule). Deliberately NOT code: JSON
+# schemas (schemas/**), example fixtures (examples/**), docs (README/
+# CONTRIBUTING/PUBLISHING.md), server.json, glama.json — this repo is mostly
 # schemas/examples/docs, and a doc-or-schema-only PR must not misfire the gate.
 #
 # What counts as a TEST change:
 #   server/src/**/*.test.ts   clients/typescript/src/**/*.test.ts
 #   server/test/**            clients/typescript/test/**
+#   scripts/**/*.test.{js,mjs}
 # (clients/typescript/src/index.test.ts is the established convention already
 # in this repo.)
 #
@@ -73,8 +77,8 @@ git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 common="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || exit 0
 ledger="$common/review-attest.jsonl"
 
-code_re='^(server/src/.+\.ts|server/scripts/.+\.mjs|clients/typescript/src/.+\.ts)$'
-test_re='^(server/src/.+\.test\.ts|server/test/.+|clients/typescript/src/.+\.test\.ts|clients/typescript/test/.+)$'
+code_re='^(server/src/.+\.ts|server/scripts/.+\.mjs|clients/typescript/src/.+\.ts|scripts/.+\.(js|mjs|sh))$'
+test_re='^(server/src/.+\.test\.ts|server/test/.+|clients/typescript/src/.+\.test\.ts|clients/typescript/test/.+|scripts/.+\.test\.(js|mjs))$'
 
 # Evaluate HEAD plus every worktree tip; the merge could land any of them.
 tips="$(git rev-parse HEAD 2>/dev/null)
@@ -105,8 +109,8 @@ EOF
   echo "⛔ test gate — this chunk changes code with NO test change:"
   printf '%s\n' "$code_without_tests" | sed 's/^/    /'
   echo "Garth's standing rule (2026-07-16): tests for all the code we write."
-  echo "Add or update a test (server/src/*.test.ts, clients/typescript/src/*.test.ts),"
-  echo "or log an explicit waiver:"
+  echo "Add or update a test (server/src/*.test.ts, clients/typescript/src/*.test.ts,"
+  echo "scripts/*.test.js), or log an explicit waiver:"
   echo "  scripts/attest-review.sh \"waived-tests: <reason>\""
 } >&2
 exit 2

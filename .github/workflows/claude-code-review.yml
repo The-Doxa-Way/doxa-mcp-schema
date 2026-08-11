@@ -8,12 +8,17 @@ name: Claude Code Review
 # NOTE: ANTHROPIC_API_KEY is NOT yet configured as a secret on this repo
 # (verified via `gh secret list` at bootstrap time). This workflow is inert
 # until the secret is added — see the PR that introduced it.
+#
+# No `if:` on the job (doxa-cns caught this exact bug 2026-08-11, same day):
+# a pull_request-shaped condition (fork check, draft check) always evaluates
+# false on workflow_dispatch, since github.event.pull_request is null then —
+# so the job would silently NEVER run. Whoever can dispatch this workflow
+# already has write access, so there's no fork/draft case to guard.
 on:
   workflow_dispatch: {}
 
 jobs:
   review:
-    if: ${{ github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]' && github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
