@@ -1,0 +1,102 @@
+name: Claude Code Review
+
+# Landing-gates bootstrap (Garth 2026-08-11): review is local (b)/(c) via
+# /code-review or a fresh reviewer agent + scripts/attest-review.sh, enforced
+# by .claude/hooks/review-gate.sh. Manual dispatch only — no automatic
+# pull_request trigger (cost-conscious doctrine, matches doxa-cns/openclaw).
+#
+# NOTE: ANTHROPIC_API_KEY is NOT yet configured as a secret on this repo
+# (verified via `gh secret list` at bootstrap time). This workflow is inert
+# until the secret is added — see the PR that introduced it.
+#
+# No `if:` on the job (doxa-cns caught this exact bug 2026-08-11, same day):
+# a pull_request-shaped condition (fork check, draft check) always evaluates
+# false on workflow_dispatch, since github.event.pull_request is null then —
+# so the job would silently NEVER run. Whoever can dispatch this workflow
+# already has write access, so there's no fork/draft case to guard.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Pinned deliberately — bump only when adopting a newer release on
+      # purpose. Review-bot model parity (doxa-cns doctrine): the reviewer
+      # must be at least as capable as the models writing the code, so this
+      # pins the current Opus-tier id.
+      - uses: anthropics/claude-code-action@v1.0.152
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--model claude-opus-4-8"
+          include_fix_links: true
+          # Force tag mode so the review is POSTED (tracking comment + summary).
+          track_progress: true
+          # Post inline comments immediately. classify=true (the default)
+          # buffers comments and can drop anything judged a "test/probe".
+          classify_inline_comments: false
+          prompt: |
+            You are reviewing a PR for doxa-mcp-schema, the public protocol
+            repo for Doxa MCP (the hosted Model Context Protocol server at
+            https://doxa.app/mcp/v1). This repo ships JSON schemas, a local
+            stdio server (server/), a TypeScript client (clients/typescript/),
+            install examples, and publishing docs. It is PUBLIC — read
+            CONTRIBUTING.md and PUBLISHING.md first for what this repo is for
+            and what must never land here.
+
+            Review this PR thoroughly. Post inline comments on specific code
+            issues and a summary comment with overall assessment.
+
+            ## This repo's specific risk areas
+
+            - **Schema breaking changes**: doxa-mcp-schema publishes the tool
+              schemas (schemas/*.json) that every downstream MCP client
+              (Claude Desktop, Cursor, Cline, custom integrations) depends on.
+              A field REMOVAL, RENAME, or TYPE CHANGE to a published tool
+              schema silently breaks every client already wired to it. Flag
+              any such change in schemas/ that has no accompanying version
+              bump (server.json `version`) or migration note in the PR/docs.
+              New optional fields are safe; changes to required fields or
+              existing field shapes are not.
+
+            - **Attribution footer must survive**: per Doxa's free-tier
+              funnel doctrine, every `doxa_encourage` / `doxa_scripture`
+              response must keep the `— Doxa · doxa.app` attribution footer
+              and the doxa.app deep links (CONTRIBUTING.md: "PRs that strip
+              the attribution footer... will not be accepted"; README.md:
+              "These must remain visible to end users"). Flag any edit to
+              examples/, schemas/, server/src/, or clients/typescript/src/
+              that removes, mangles, or make-optional this footer or the
+              `_powered_by` / `_install_doxa` fields in example fixtures.
+
+            - **No secrets in a public repo**: this repo is public. Flag any
+              hardcoded API key, token, credential, or anything that should
+              live in an environment variable or a private repo instead
+              (the voice-encourager system prompt and edge function source
+              must NEVER appear here — see CONTRIBUTING.md "What we won't
+              accept").
+
+            - **General correctness & test coverage**: in server/src/ and
+              clients/typescript/src/, check for logic errors, missing error
+              handling on the HTTP forward-to-hosted-endpoint path, type
+              safety issues, and whether behavior changes are covered by a
+              test (clients/typescript/src/index.test.ts is the existing
+              pattern). JSON schema and example-fixture-only PRs do not need
+              new tests, but a code change to server/ or clients/ without one
+              should be flagged.
+
+            Be specific and actionable. Only comment on issues worth fixing —
+            skip style nitpicks. Categorize each finding: HIGH (must fix),
+            MEDIUM (should fix), LOW (nice to have).

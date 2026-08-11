@@ -1,0 +1,62 @@
+name: KG Guard
+
+# kg-save on every merge (standing rule, Garth): work that lands carries its
+# knowledge-graph entry in the SAME PR. The doxa-cns PreToolUse hook only
+# binds Claude sessions running in that checkout — sessions merging from
+# another cwd, child-process merges (auto-lander), and humans all bypass it.
+# CI on the PR is the one chokepoint every merge path crosses.
+#
+# Exempt: PR title containing [skip-kg], titles starting chore(sync)/
+# chore(deps), the skip-kg label, dependabot, forks. Exemptions ride the PR
+# title/labels — visible and auditable, never silent.
+
+on:
+  pull_request:
+    # labeled/unlabeled included so adding the skip-kg label re-runs the check
+    # (default types would leave a failed check stale after labeling).
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    if: ${{ github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]' }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require a kg-save with the merged work
+        run: |
+          EV="$GITHUB_EVENT_PATH"
+          TITLE=$(jq -r '.pull_request.title // ""' "$EV")
+          case "$TITLE" in
+            *'[skip-kg]'*) echo "exempt by title token: [skip-kg]"; exit 0;;
+            'chore(sync)'*|'chore(deps)'*) echo "exempt generated/deps PR: $TITLE"; exit 0;;
+          esac
+          if jq -e '.pull_request.labels[]? | select(.name=="skip-kg")' "$EV" >/dev/null; then
+            echo "exempt by label: skip-kg"; exit 0
+          fi
+
+          BASE=$(jq -r '.pull_request.base.sha' "$EV")
+          HEAD=$(jq -r '.pull_request.head.sha' "$EV")
+          if ! CHANGED=$(git diff --name-only "$BASE"..."$HEAD"); then
+            echo "::error::git diff $BASE...$HEAD failed — infra problem, not a missing kg-save."
+            exit 1
+          fi
+          if echo "$CHANGED" | grep -q '^\.knowledge-graph/'; then
+            echo "kg-save present in this PR."
+            exit 0
+          fi
+
+          echo "::error::This PR lands work with no .knowledge-graph/ change (kg-save on every merge is standing doctrine)."
+          echo ""
+          echo "Bank what this PR changed and why, in this branch:"
+          echo '  node scripts/knowledge-graph-merkle.js add "<EntityName>" "<what changed + why it matters>" <source-file> --type <Type>'
+          echo "then commit the .knowledge-graph/ update into this PR."
+          echo ""
+          echo "Genuinely knowledge-free change (typo, generated state)? Add [skip-kg] to the"
+          echo "PR title or the skip-kg label — the exemption stays visible in the PR record."
+          exit 1
