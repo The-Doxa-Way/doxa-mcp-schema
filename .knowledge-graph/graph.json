@@ -1,0 +1,12 @@
+{
+  "entities": [
+    {
+      "name": "LandingGatesInfra",
+      "entityType": "Workflow",
+      "observations": [
+        "Bootstrapped Doxa's standard landing-gate infrastructure into doxa-mcp-schema (2026-08-11): KG Guard + Claude Code Review CI workflows, kg-save/review/test PreToolUse hooks, attest-review.sh, knowledge-graph-merkle.js + ontology-guard.js + kg-index.js, .claude/settings.json hook wiring. Ported from openclaw's working reference implementation per doxa-cns CLAUDE.md PR-visibility / bank-the-gold / kg-save-on-every-merge doctrine. test-gate.sh code_re scoped to server/src + server/scripts + clients/typescript/src (schemas/examples/docs excluded — this repo is mostly schema+docs). NOTE: ANTHROPIC_API_KEY secret not yet configured on GitHub for this repo — review workflow is inert until Garth adds it."
+      ]
+    }
+  ],
+  "relations": []
+}
