@@ -149,13 +149,14 @@ function loadGraph() {
 }
 
 function saveGraph(graph) {
-  // Ensure the directory exists
-  const dir = path.dirname(GRAPH_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  // Atomic write: tmp + rename
-  const tmp = GRAPH_FILE + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(graph, null, 2));
-  fs.renameSync(tmp, GRAPH_FILE);
+  // Atomic write: pid+counter-unique tmp name + fsync (atomicWriteJSON),
+  // matching saveMerkleState below. The old inline `tmp = GRAPH_FILE +
+  // '.tmp'` + writeFileSync + renameSync had neither: a fixed, non-unique
+  // tmp filename that two concurrent `add` invocations can race on, and no
+  // fsync, so a crash mid-write could leave a torn or missing file.
+  // atomicWriteJSON creates its own parent dir, so no separate mkdir here.
+  // (2026-08-11 fix, ported from doxa-cns's canonical file.)
+  atomicWriteJSON(GRAPH_FILE, graph);
   // The generator owns its derived output: every graph write refreshes the
   // cheap navigation surface (.knowledge-graph/INDEX.md) so it can never
   // drift. Failure here must not lose the graph write itself — warn loud.
@@ -540,6 +541,20 @@ function add(args) {
     } else {
       positional.push(args[i]);
     }
+  }
+
+  // Guard: a trailing --type with no value falls through the loop above into
+  // `positional` as a plain string, since `args[i + 1]` is undefined and the
+  // `--type` branch never fires. Left unguarded, it silently becomes
+  // sourceFile/lineNumber/an extra positional below — for an EXISTING entity
+  // (--type is optional there) this used to persist a NaN line number into
+  // provenance with NO error surfaced at all. Reject loudly instead (2026-08-11
+  // fix, ported from doxa-cns's canonical file).
+  if (positional.includes('--type')) {
+    console.log(`${c.red}--type given with no value after it.${c.reset}\n` +
+      `${c.yellow}Usage: add <entity> <observation> <source-file> [line] --type <EntityType>${c.reset}`);
+    process.exitCode = 1;
+    return;
   }
   const [entityName, observation, sourceFile, lineNumber] = positional;
 
