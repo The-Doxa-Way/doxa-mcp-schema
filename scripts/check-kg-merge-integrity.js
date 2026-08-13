@@ -12,6 +12,13 @@
  * mergeResolve() in knowledge-graph-merkle.js for the correct fix
  * (hash-keyed union of both sides).
  *
+ * Scope: only .knowledge-graph-merkle.json is compared. .knowledge-graph/
+ * graph.json is a pure projection of it (rebuilt by reconcile()/mergeResolve()
+ * from the merkle observations, never hand-merged) — the merkle log is the
+ * one place data loss is unrecoverable, so it's the one place this detector
+ * needs to look. (`relations` in graph.json is a separate, pre-existing gap
+ * with no merkle backing at all — out of scope here, tracked separately.)
+ *
  * A naive count comparison (merged >= max(parent counts)) is NOT enough to
  * catch this: in the real incident, the branch's tip and origin/main's tip
  * both happened to hold 970 observations (the branch had gained its own
@@ -28,7 +35,13 @@
  *   head-ref defaults to HEAD.
  * Exit 0: no violation (including "no merge commits in range" / "file never
  *   touched" — this check only fires on a CONFIRMED drop, matching the
- *   fail-open philosophy of every other gate in this fleet).
+ *   fail-open philosophy of every other gate in this fleet). ALSO exit 0 on
+ *   any unexpected internal error (a crash must never read as a violation —
+ *   see the top-level try/catch in main()'s caller below; review 2026-08-13
+ *   caught this reported as a real gap: an uncaught throw here previously
+ *   exited 1, indistinguishable from a confirmed drop, and the calling hook
+ *   blocks on exit 1 — a bug in THIS script would then wrongly block a
+ *   legitimate landing instead of failing open like every other check here).
  * Exit 1: a violation was found; details printed to stderr.
  */
 
@@ -52,33 +65,35 @@ function observationsAt(ref, path) {
   } catch {
     return null; // file didn't exist at this ref — not this check's concern
   }
+  let data;
   try {
-    const data = JSON.parse(content);
-    if (!Array.isArray(data.observations)) return null;
-    const map = new Map();
-    for (const obs of data.observations) {
-      if (obs && obs.hash) map.set(obs.hash, obs.entityName || '(unknown entity)');
-    }
-    return map;
+    data = JSON.parse(content);
   } catch {
     return null; // unparseable — not this check's concern (fail open)
   }
+  if (!Array.isArray(data.observations)) return null;
+  const map = new Map();
+  for (const obs of data.observations) {
+    // A malformed observation (missing/non-string hash) is skipped, not
+    // indexed under a shared falsy/undefined key — review 2026-08-13: the
+    // prior version's `if (obs && obs.hash)` let a non-string hash (e.g. a
+    // hand-edited file with a numeric or duplicate-empty hash) collapse
+    // multiple observations onto one Map key, silently discarding the
+    // others INSIDE the very tool meant to catch silent discarding.
+    if (obs && typeof obs.hash === 'string' && obs.hash.length > 0) {
+      map.set(obs.hash, typeof obs.entityName === 'string' ? obs.entityName : '(unknown entity)');
+    }
+  }
+  return map;
 }
 
-function main() {
-  const base = process.argv[2];
-  const head = process.argv[3] || 'HEAD';
-  if (!base) {
-    console.error('Usage: check-kg-merge-integrity.js <base-ref> [<head-ref>]');
-    process.exit(0); // fail open on misuse — never block on a bad invocation
-  }
-
+function run(base, head) {
   const KG_PATH = '.knowledge-graph-merkle.json';
   let mergeCommits;
   try {
     mergeCommits = sh(`git rev-list --merges ${base}..${head}`).split('\n').filter(Boolean);
   } catch {
-    process.exit(0); // no such range (e.g. base doesn't exist locally) — fail open
+    return { violations: [] }; // no such range (e.g. base doesn't exist locally) — fail open
   }
 
   const violations = [];
@@ -120,6 +135,19 @@ function main() {
     }
   }
 
+  return { violations };
+}
+
+function main() {
+  const base = process.argv[2];
+  const head = process.argv[3] || 'HEAD';
+  if (!base) {
+    console.error('Usage: check-kg-merge-integrity.js <base-ref> [<head-ref>]');
+    process.exit(0); // fail open on misuse — never block on a bad invocation
+  }
+
+  const { violations } = run(base, head);
+
   if (violations.length === 0) {
     process.exit(0);
   }
@@ -141,4 +169,13 @@ function main() {
   process.exit(1);
 }
 
-main();
+// Top-level guard: ANY uncaught exception here must fail OPEN (exit 0), never
+// exit non-zero — the calling hook cannot tell "this script found a real
+// violation" apart from "this script crashed" by exit code alone (both were
+// exit 1 before this fix), and a crash must never block a legitimate landing.
+try {
+  main();
+} catch (err) {
+  console.error(`check-kg-merge-integrity.js: internal error, failing open: ${err && err.message}`);
+  process.exit(0);
+}

@@ -475,14 +475,18 @@ ${c.bright}Commands:${c.reset}
     missing from graph.json. Safe to re-run. Useful after batch edits.
 
   ${c.green}merge-resolve <ours-file> <theirs-file>${c.reset}
-    MANDATORY whenever git reports a conflict on .knowledge-graph-merkle.json
-    or .knowledge-graph/graph.json. NEVER resolve those conflicts with
-    'git checkout --ours'/'--theirs' — the observations array is an append
-    log, and picking a side silently discards the other side's KG entries
-    (this is how a real bug shipped with no KG record of it once — see the
-    comment on mergeResolve() in this file). Unions both sides by hash
-    (nothing is ever dropped), rebuilds the Merkle root, and reconciles
-    graph.json from the result.
+    MANDATORY whenever git reports a conflict on .knowledge-graph-merkle.json.
+    NEVER resolve that conflict with 'git checkout --ours'/'--theirs' — the
+    observations array is an append log, and picking a side silently
+    discards the other side's KG entries (this is how a real bug shipped
+    with no KG record of it once — see the comment on mergeResolve() in this
+    file). Unions both sides by hash (nothing is ever dropped), rebuilds the
+    Merkle root, and reconciles .knowledge-graph/graph.json from the result
+    — so a graph.json conflict alongside it needs no separate handling: just
+    take either side (checkout --ours is fine there) and let this command
+    regenerate it correctly. graph.json is a pure projection of the merkle
+    log, never a second source of truth, so it cannot itself lose data that
+    isn't already lost from merkle.json.
     Example: git show :2:.knowledge-graph-merkle.json > /tmp/ours.json
              git show :3:.knowledge-graph-merkle.json > /tmp/theirs.json
              node scripts/knowledge-graph-merkle.js merge-resolve /tmp/ours.json /tmp/theirs.json
@@ -737,15 +741,43 @@ function mergeResolve(oursPath, theirsPath) {
     return;
   }
 
-  const ours = JSON.parse(fs.readFileSync(oursPath, 'utf8'));
-  const theirs = JSON.parse(fs.readFileSync(theirsPath, 'utf8'));
+  let ours, theirs;
+  try {
+    ours = JSON.parse(fs.readFileSync(oursPath, 'utf8'));
+  } catch (err) {
+    console.log(`${c.red}Could not read/parse ours-file "${oursPath}": ${err.message}${c.reset}`);
+    process.exitCode = 1;
+    return;
+  }
+  try {
+    theirs = JSON.parse(fs.readFileSync(theirsPath, 'utf8'));
+  } catch (err) {
+    console.log(`${c.red}Could not read/parse theirs-file "${theirsPath}": ${err.message}${c.reset}`);
+    process.exitCode = 1;
+    return;
+  }
 
   const byHash = new Map();
+  let skippedMalformed = 0;
   for (const obs of [...(ours.observations || []), ...(theirs.observations || [])]) {
+    // A missing/non-string hash can't be indexed at all: falling through to
+    // byHash.set(undefined, obs) would collapse every such observation onto
+    // ONE map key, silently discarding all but the last — exactly the class
+    // of data loss this whole tool exists to prevent, reintroduced inside
+    // the fix itself. Skip and count instead.
+    if (!obs || typeof obs.hash !== 'string' || obs.hash.length === 0) {
+      skippedMalformed++;
+      continue;
+    }
     byHash.set(obs.hash, obs); // hash-keyed: identical observations collapse, never duplicate
   }
+  // Deterministic regardless of (ours, theirs) argument order: primary sort
+  // by timestamp, but ties broken by hash (stable, unique, order-independent)
+  // rather than by array insertion order — a timestamp-only sort is NOT
+  // actually order-independent for observations sharing a timestamp,
+  // contradicting this function's own documented determinism guarantee.
   const merged = [...byHash.values()].sort((a, b) =>
-    (a.timestamp || '').localeCompare(b.timestamp || ''));
+    (a.timestamp || '').localeCompare(b.timestamp || '') || a.hash.localeCompare(b.hash));
 
   const oursCount = (ours.observations || []).length;
   const theirsCount = (theirs.observations || []).length;
@@ -763,6 +795,7 @@ function mergeResolve(oursPath, theirsPath) {
   console.log(`\n${c.cyan}Merged merkle state: ${oursCount} (ours) + ${theirsCount} (theirs) -> ${merged.length} (unioned, deduped by hash)${c.reset}`);
   if (onlyInOurs > 0) console.log(`${c.green}  ${onlyInOurs} observation(s) unique to ours — preserved${c.reset}`);
   if (onlyInTheirs > 0) console.log(`${c.green}  ${onlyInTheirs} observation(s) unique to theirs — preserved${c.reset}`);
+  if (skippedMalformed > 0) console.log(`${c.yellow}  ${skippedMalformed} malformed observation(s) (no valid hash) skipped — could not be merged safely${c.reset}`);
 
   console.log(`\n${c.cyan}Reconciling .knowledge-graph/graph.json from the merged state...${c.reset}`);
   const result = reconcile();
