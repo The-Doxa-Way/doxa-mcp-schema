@@ -469,6 +469,25 @@ ${c.bright}Commands:${c.reset}
     any observations/entities that exist in the merkle audit trail but are
     missing from graph.json. Safe to re-run. Useful after batch edits.
 
+  ${c.green}reconcile${c.reset}
+    Self-heal .knowledge-graph/graph.json from the merkle state. Backfills
+    any observations/entities that exist in the merkle audit trail but are
+    missing from graph.json. Safe to re-run. Useful after batch edits.
+
+  ${c.green}merge-resolve <ours-file> <theirs-file>${c.reset}
+    MANDATORY whenever git reports a conflict on .knowledge-graph-merkle.json
+    or .knowledge-graph/graph.json. NEVER resolve those conflicts with
+    'git checkout --ours'/'--theirs' — the observations array is an append
+    log, and picking a side silently discards the other side's KG entries
+    (this is how a real bug shipped with no KG record of it once — see the
+    comment on mergeResolve() in this file). Unions both sides by hash
+    (nothing is ever dropped), rebuilds the Merkle root, and reconciles
+    graph.json from the result.
+    Example: git show :2:.knowledge-graph-merkle.json > /tmp/ours.json
+             git show :3:.knowledge-graph-merkle.json > /tmp/theirs.json
+             node scripts/knowledge-graph-merkle.js merge-resolve /tmp/ours.json /tmp/theirs.json
+
+
   ${c.green}verify${c.reset}
     Verify the entire knowledge graph integrity
 
@@ -686,6 +705,72 @@ function runReconcile() {
   }
 }
 
+/**
+ * Merge-conflict resolver for .knowledge-graph-merkle.json (2026-08-13,
+ * Garth: "this should be standing doctrine and practice across all repos").
+ *
+ * The merkle observations array is an APPEND LOG: two branches can each add
+ * observations the other doesn't have. A conflict on this file is NEVER
+ * safe to resolve with `git checkout --ours`/`--theirs` — whichever side
+ * loses is silently dropped, code and all, with no error anywhere (this is
+ * exactly how PR #343's KgAddTrailingTypeFlagFix entity vanished: taking
+ * origin/main's merkle.json wholesale during a conflict discarded the
+ * branch's own observation, and the planned "re-add it after" step was
+ * skipped — the bug shipped correctly, its KG record didn't).
+ *
+ * mergeResolve(oursPath, theirsPath) unions both sides' observations by
+ * hash (each observation's hash is content-addressed and unique, so a
+ * hash-keyed union can never duplicate or silently prefer one side), sorts
+ * by timestamp for a deterministic result regardless of arg order, rebuilds
+ * the Merkle root from the unioned set, writes it as THIS repo's current
+ * merkle state, then reconciles graph.json from it — so both the audit
+ * trail and the projection are guaranteed complete, no matter which side of
+ * the conflict "won" for every other file.
+ */
+function mergeResolve(oursPath, theirsPath) {
+  if (!oursPath || !theirsPath) {
+    console.log(`${c.red}Usage: merge-resolve <ours-file> <theirs-file>${c.reset}`);
+    console.log(`${c.yellow}Typically: git show :2:.knowledge-graph-merkle.json > /tmp/ours.json${c.reset}`);
+    console.log(`${c.yellow}           git show :3:.knowledge-graph-merkle.json > /tmp/theirs.json${c.reset}`);
+    console.log(`${c.yellow}           node scripts/knowledge-graph-merkle.js merge-resolve /tmp/ours.json /tmp/theirs.json${c.reset}`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const ours = JSON.parse(fs.readFileSync(oursPath, 'utf8'));
+  const theirs = JSON.parse(fs.readFileSync(theirsPath, 'utf8'));
+
+  const byHash = new Map();
+  for (const obs of [...(ours.observations || []), ...(theirs.observations || [])]) {
+    byHash.set(obs.hash, obs); // hash-keyed: identical observations collapse, never duplicate
+  }
+  const merged = [...byHash.values()].sort((a, b) =>
+    (a.timestamp || '').localeCompare(b.timestamp || ''));
+
+  const oursCount = (ours.observations || []).length;
+  const theirsCount = (theirs.observations || []).length;
+  const onlyInOurs = merged.length - theirsCount;
+  const onlyInTheirs = merged.length - oursCount;
+
+  const state = {
+    merkleRoot: buildMerkleTree(merged.map((o) => o.hash)),
+    observations: merged,
+    lastVerified: null,
+    version: 1,
+  };
+  saveMerkleState(state);
+
+  console.log(`\n${c.cyan}Merged merkle state: ${oursCount} (ours) + ${theirsCount} (theirs) -> ${merged.length} (unioned, deduped by hash)${c.reset}`);
+  if (onlyInOurs > 0) console.log(`${c.green}  ${onlyInOurs} observation(s) unique to ours — preserved${c.reset}`);
+  if (onlyInTheirs > 0) console.log(`${c.green}  ${onlyInTheirs} observation(s) unique to theirs — preserved${c.reset}`);
+
+  console.log(`\n${c.cyan}Reconciling .knowledge-graph/graph.json from the merged state...${c.reset}`);
+  const result = reconcile();
+  console.log(`${c.green}Entities created:${c.reset}        ${result.createdCount}`);
+  console.log(`${c.green}Observations appended:${c.reset}   ${result.appendedCount}`);
+  console.log(`\n${c.bright}Resolved. Now: git add .knowledge-graph-merkle.json .knowledge-graph/graph.json .knowledge-graph/INDEX.md${c.reset}`);
+}
+
 function verify() {
   const results = verifyKnowledgeGraph();
 
@@ -901,6 +986,9 @@ if (require.main === module) {
       break;
     case 'reconcile':
       runReconcile();
+      break;
+    case 'merge-resolve':
+      mergeResolve(args[0], args[1]);
       break;
     case 'help':
     case '--help':

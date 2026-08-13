@@ -13,6 +13,13 @@
       "observations": [
         "Propagated the 2026-08-11 atomic-write and --type-guard fixes from doxa-cns's canonical knowledge-graph-merkle.js."
       ]
+    },
+    {
+      "name": "KgMergeIntegrityGuard",
+      "entityType": "Fix",
+      "observations": [
+        "New standing gate (2026-08-13, Garth: 'standing doctrine and practice across all repos'): merge-resolve CLI command unions both sides of a .knowledge-graph-merkle.json conflict by observation hash instead of picking one (the observations array is an append log; checkout --ours/--theirs always drops data). check-kg-merge-integrity.js is the mechanical detector wired into kg-save-gate.sh: for any merge commit in the landing range, if the result is missing an observation hash present in a parent, the landing is blocked and the specific dropped entity is named. Ported from doxa-cns's canonical version, built and verified against the real incident that motivated it (PR #343's KgAddTrailingTypeFlagFix entity, silently dropped by checkout --theirs)."
+      ]
     }
   ],
   "relations": []
