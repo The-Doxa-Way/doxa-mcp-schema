@@ -117,6 +117,48 @@ fi
 cd "$dir" 2>/dev/null || exit 0
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 
+# ---------------------------------------------------------------------------
+# Merge-integrity check (2026-08-13, Garth: "standing doctrine and practice
+# across all repos"). Real incident: a merge conflict on
+# .knowledge-graph-merkle.json resolved with `git checkout --theirs` silently
+# discarded a branch's own observation — the observations array is an append
+# log, and a naive "pick a side" resolution can only ever keep a subset.
+#
+# Runs HERE, unconditionally, immediately after cwd/worktree validation and
+# BEFORE every other early-exit path below (repo_common, base/empty-range,
+# hand-authored) — review 2026-08-13 (propagated from doxa-cns's own
+# placement fix) found this originally landed AFTER the repo_common and
+# base/empty-range checks in THIS file, so an exit 0 from either of those
+# (e.g. a chained landing command that targets a different repo, or a
+# same-repo landing with local HEAD already at origin/main) skipped past a
+# check placed later without ever reaching it. It now computes its own
+# independent base rather than reusing the (not-yet-calculated) $base below,
+# so it never depends on repo_common or the base/empty-range checks having
+# already run. This repo's landing verb is already narrowed to
+# push/pr-create/pr-merge by the regex match earlier in this file, so this
+# evaluates on every genuine landing attempt for the resolved $dir — it
+# protects any session that resolved a conflict in this checkout, whether it
+# then lands via `gh pr merge`, `git push`, or `gh pr create`. A merge landed
+# with no local involvement (GitHub UI, a bot with no checkout, or the MCP
+# merge_pull_request path above, which returns before ever reaching this
+# line) has nothing local to check and is out of this hook's reach by
+# construction.
+#
+# Fail-open on any tooling trouble (script missing, node missing, no
+# origin/main, empty range) — this block must never itself become the reason
+# a legitimate landing is blocked.
+if command -v node >/dev/null 2>&1 && [ -f "$dir/scripts/check-kg-merge-integrity.js" ]; then
+  integrity_base="$(git merge-base HEAD origin/main 2>/dev/null)"
+  if [ -n "$integrity_base" ] && [ "$integrity_base" != "$(git rev-parse HEAD 2>/dev/null)" ]; then
+    integrity_output="$(node "$dir/scripts/check-kg-merge-integrity.js" "$integrity_base" HEAD 2>&1)"
+    integrity_status=$?
+    if [ "$integrity_status" -eq 1 ]; then
+      printf '%s\n' "$integrity_output" >&2
+      exit 2
+    fi
+  fi
+fi
+
 # Only gate the doxa-mcp-schema repo itself; allow landings on other repos.
 # Compare via --git-common-dir (resolves the MAIN checkout's .git dir for any
 # linked worktree of the same repo), NOT --show-toplevel.

@@ -4,6 +4,11 @@
 <!-- Lookup: Grep this file for your topic, then read that   -->
 <!-- entity out of .knowledge-graph/graph.json directly.     -->
 
+## Fix (2)
+
+- KgMergeIntegrityGuard — New standing gate (2026-08-13, Garth: 'standing doctrine and practice across all repos'): merge-resolve CLI c…
+- KgMerkleFixesPropagated — Propagated the 2026-08-11 atomic-write and --type-guard fixes from doxa-cns's canonical knowledge-graph-merkl…
+
 ## Workflow (1)
 
 - LandingGatesInfra — Bootstrapped Doxa's standard landing-gate infrastructure into doxa-mcp-schema (2026-08-11): KG Guard + Claude…
