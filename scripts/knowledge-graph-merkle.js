@@ -758,19 +758,27 @@ function mergeResolve(oursPath, theirsPath) {
   }
 
   const byHash = new Map();
+  const oursHashes = new Set();
+  const theirsHashes = new Set();
   let skippedMalformed = 0;
-  for (const obs of [...(ours.observations || []), ...(theirs.observations || [])]) {
-    // A missing/non-string hash can't be indexed at all: falling through to
-    // byHash.set(undefined, obs) would collapse every such observation onto
-    // ONE map key, silently discarding all but the last — exactly the class
-    // of data loss this whole tool exists to prevent, reintroduced inside
-    // the fix itself. Skip and count instead.
+  // A missing/non-string hash can't be indexed at all: falling through to
+  // byHash.set(undefined, obs) would collapse every such observation onto
+  // ONE map key, silently discarding all but the last — exactly the class
+  // of data loss this whole tool exists to prevent, reintroduced inside
+  // the fix itself. Skip and count instead — validHashes tracks each side's
+  // OWN valid hashes separately (not just raw .length) so the onlyInOurs/
+  // onlyInTheirs tallies below stay correct when a side has malformed
+  // entries mixed in with valid ones.
+  const index = (obs, sideHashes) => {
     if (!obs || typeof obs.hash !== 'string' || obs.hash.length === 0) {
       skippedMalformed++;
-      continue;
+      return;
     }
     byHash.set(obs.hash, obs); // hash-keyed: identical observations collapse, never duplicate
-  }
+    sideHashes.add(obs.hash);
+  };
+  for (const obs of ours.observations || []) index(obs, oursHashes);
+  for (const obs of theirs.observations || []) index(obs, theirsHashes);
   // Deterministic regardless of (ours, theirs) argument order: primary sort
   // by timestamp, but ties broken by hash (stable, unique, order-independent)
   // rather than by array insertion order — a timestamp-only sort is NOT
@@ -781,8 +789,16 @@ function mergeResolve(oursPath, theirsPath) {
 
   const oursCount = (ours.observations || []).length;
   const theirsCount = (theirs.observations || []).length;
-  const onlyInOurs = merged.length - theirsCount;
-  const onlyInTheirs = merged.length - oursCount;
+  // Counted by SET MEMBERSHIP among valid hashes, not by subtracting raw
+  // (possibly malformed-inflated) array lengths from merged.length — the
+  // subtraction form went negative (and silently failed the `> 0` print
+  // guard below) whenever malformed entries were present on one side,
+  // since they're excluded from `merged` but were still counted in
+  // oursCount/theirsCount.
+  let onlyInOurs = 0;
+  let onlyInTheirs = 0;
+  for (const h of oursHashes) if (!theirsHashes.has(h)) onlyInOurs++;
+  for (const h of theirsHashes) if (!oursHashes.has(h)) onlyInTheirs++;
 
   const state = {
     merkleRoot: buildMerkleTree(merged.map((o) => o.hash)),

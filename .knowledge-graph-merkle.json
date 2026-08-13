@@ -1,5 +1,5 @@
 {
-  "merkleRoot": "2e302388cfb704cdcf6f3e3889591ad2731867dd3ed990314cb7f55527f4c644",
+  "merkleRoot": "bc27f13971559008cf23fa638d05a38e05aed6125cd57a36f783d6bcc448304b",
   "observations": [
     {
       "hash": "cea4759598e6a97c2fb1dc74d18ca53b7255641b0f0bbe866f1533d3e1ac8b43",
@@ -19,20 +19,20 @@
       "timestamp": "2026-08-11T16:37:25.524Z"
     },
     {
-      "hash": "c55de19ef2b93fe4cb692f60eb7048041f5822f46efe6c0e954c1942a0e2b0b0",
+      "hash": "de6eaaa7304fd37abf87c8ebae9687819c6ed8ebe4aebb9f0098e80f8ffe4b72",
       "entityName": "KgMerkleFixesPropagated",
       "content": "Propagated the 2026-08-11 atomic-write and --type-guard fixes from doxa-cns's canonical knowledge-graph-merkle.js.",
       "provenance": {
         "sourceFile": "scripts/knowledge-graph-merkle.js",
         "lineNumber": 1,
         "lineRange": null,
-        "fileHash": "1ef3f8fe2fea21433fa1037099a131e56c9e8b4328a26025a0386a3b3c087c52",
-        "totalLines": 1045,
+        "fileHash": "7626602ff2b35cf4d6431d037a047300163b8bd03ba510a7d4e68cd501b44cb2",
+        "totalLines": 1061,
         "extractedAt": "2026-08-11T21:04:04.714Z",
         "verificationStatus": "verified",
         "extractedBy": "knowledge-graph-merkle.js",
         "entityType": "Fix",
-        "rehashedAt": "2026-08-13T11:02:34.774Z"
+        "rehashedAt": "2026-08-13T14:42:13.083Z"
       },
       "timestamp": "2026-08-11T21:04:04.714Z"
     },
@@ -70,10 +70,27 @@
         "entityType": "Fix"
       },
       "timestamp": "2026-08-13T11:02:24.384Z"
+    },
+    {
+      "hash": "b2ac29aaf577de50dfcd79fa53229179876a8489fcad13d2aeb1dfc40d97d5d9",
+      "entityName": "KgMergeIntegrityGuard",
+      "content": "Fixed a review finding on the hardening commit (1c0d11c): mergeResolve()'s 'unique to ours/theirs' console summary computed onlyInOurs/onlyInTheirs as merged.length minus RAW (unfiltered) oursCount/theirsCount, so malformed entries — excluded from merged but still counted in the raw lengths — could push the subtraction negative and silently suppress a genuinely-unique observation's report (no data loss, cosmetic only, verified by a synchronous independent code-review agent that ran the pre/post-fix tests to confirm). Fixed by counting via set membership over each side's valid hashes instead of length subtraction. Added a regression test.",
+      "provenance": {
+        "sourceFile": "scripts/knowledge-graph-merkle.js",
+        "lineNumber": null,
+        "lineRange": null,
+        "fileHash": "7626602ff2b35cf4d6431d037a047300163b8bd03ba510a7d4e68cd501b44cb2",
+        "totalLines": 1061,
+        "extractedAt": "2026-08-13T14:42:06.877Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "Fix"
+      },
+      "timestamp": "2026-08-13T14:42:06.878Z"
     }
   ],
-  "lastVerified": "2026-08-13T11:02:34.971Z",
+  "lastVerified": "2026-08-13T14:42:13.135Z",
   "version": 1,
   "createdAt": "2026-08-11T16:37:19.499Z",
-  "lastModified": "2026-08-13T11:02:34.974Z"
+  "lastModified": "2026-08-13T14:42:13.136Z"
 }

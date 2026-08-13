@@ -153,6 +153,30 @@ test('a malformed observation (no hash) is skipped, not silently collapsed into 
   fs.rmSync(root, { recursive: true, force: true });
 });
 
+test('reports "unique to theirs" correctly even when ours also has malformed entries mixed in with valid ones', () => {
+  // Regression for a review finding: onlyInOurs/onlyInTheirs used to be
+  // computed as merged.length - <raw, unfiltered> theirsCount/oursCount.
+  // Malformed entries are excluded from `merged` but were still counted in
+  // the raw lengths, so with 2 malformed entries in ours and 1 valid entry
+  // unique to theirs, the old formula produced onlyInTheirs = 1 - 2 = -1,
+  // which silently failed the `> 0` print guard even though "Real" (theirs)
+  // genuinely was unique.
+  const root = sandbox();
+  const malformed1 = { entityName: 'Ghost1', content: 'no hash', provenance: {}, timestamp: '2026-01-01T00:00:00.000Z' };
+  const malformed2 = { entityName: 'Ghost2', content: 'no hash either', provenance: {}, timestamp: '2026-01-01T00:00:00.000Z' };
+  const oursPath = path.join(root, 'ours.json');
+  fs.writeFileSync(oursPath, JSON.stringify({ merkleRoot: 'x', observations: [malformed1, malformed2], lastVerified: null, version: 1 }));
+  const theirs = writeFixture(root, 'theirs.json', [obs('h1', 'Real')]);
+
+  const output = runMergeResolve(root, oursPath, theirs);
+
+  const state = readState(root);
+  assert.deepStrictEqual(state.observations.map((o) => o.entityName), ['Real'], 'the valid observation must be preserved; malformed ones dropped');
+  assert.match(output, /1 observation\(s\) unique to theirs/, 'must report the genuinely-unique observation, not suppress it on a negative-count bug');
+
+  fs.rmSync(root, { recursive: true, force: true });
+});
+
 test('a missing/unparseable ours or theirs file produces a friendly error, not a raw stack trace', () => {
   const root = sandbox();
   const theirs = writeFixture(root, 'theirs.json', [obs('h1', 'Real')]);
