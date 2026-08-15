@@ -19,6 +19,11 @@ on:
 
 jobs:
   check:
+    # Explicit name, because this job's check-run name is what a branch
+    # ruleset's required-status-check matches on. Left implicit it reports as
+    # the bare job id "check" — ambiguous against any other workflow that
+    # happens to id a job "check", and meaningless in the PR checks list.
+    name: KG Guard
     runs-on: ubuntu-latest
     timeout-minutes: 3
     if: ${{ github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]' }}
