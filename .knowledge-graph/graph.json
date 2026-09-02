@@ -29,6 +29,13 @@
       "observations": [
         "The kg-guard job now carries an explicit 'name: KG Guard'. Without it the job reports its check-run under the bare job id 'check' — which is what a branch ruleset's required-status-check has to match on, so requiring it was both ambiguous (any other workflow with a job id 'check' collides) and unreadable in the PR checks list. Prerequisite for the 2026-08-15 fleet-wide enforcement pass: KG Guard ran on PRs in every repo but was a REQUIRED check in none of them, so the banking doctrine rested entirely on the merger choosing to wait for green — the local .claude/hooks/kg-save-gate.sh only binds Claude sessions in that checkout, and web-UI merges bypass everything."
       ]
+    },
+    {
+      "name": "ClientTarballArtifacts",
+      "entityType": "Reference",
+      "observations": [
+        "npm pack in clients/typescript leaves thedoxaway-mcp-client-<version>.tgz in the tree. Untracked and unbanked until the 2026-09-02 fleet sweep; now gitignored so a build artifact can never be committed by accident."
+      ]
     }
   ],
   "relations": []
