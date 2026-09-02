@@ -13,6 +13,10 @@
 
 - KgGuardRequiredCheckNaming — The kg-guard job now carries an explicit 'name: KG Guard'. Without it the job reports its check-run under the…
 
+## Reference (1)
+
+- ClientTarballArtifacts — npm pack in clients/typescript leaves thedoxaway-mcp-client-<version>.tgz in the tree. Untracked and unbanked…
+
 ## Workflow (1)
 
 - LandingGatesInfra — Bootstrapped Doxa's standard landing-gate infrastructure into doxa-mcp-schema (2026-08-11): KG Guard + Claude…

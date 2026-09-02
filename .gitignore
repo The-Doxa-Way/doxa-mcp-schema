@@ -1,0 +1,3 @@
+
+# npm pack output from the TypeScript client build
+clients/typescript/*.tgz
