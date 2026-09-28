@@ -4,14 +4,15 @@
 <!-- Lookup: Grep this file for your topic, then read that   -->
 <!-- entity out of .knowledge-graph/graph.json directly.     -->
 
+## Decision (2)
+
+- BrandPresenceAudit0928 — Brand presence audit 2026-09-28: the official MCP registry listing io.github.TheDoxaWay/doxa-mcp (versions 1.…
+- KgGuardRequiredCheckNaming — The kg-guard job now carries an explicit 'name: KG Guard'. Without it the job reports its check-run under the…
+
 ## Fix (2)
 
 - KgMergeIntegrityGuard — New standing gate (2026-08-13, Garth: 'standing doctrine and practice across all repos'): merge-resolve CLI c…
 - KgMerkleFixesPropagated — Propagated the 2026-08-11 atomic-write and --type-guard fixes from doxa-cns's canonical knowledge-graph-merkl…
-
-## Decision (1)
-
-- KgGuardRequiredCheckNaming — The kg-guard job now carries an explicit 'name: KG Guard'. Without it the job reports its check-run under the…
 
 ## Reference (1)
 

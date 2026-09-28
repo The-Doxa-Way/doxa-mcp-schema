@@ -36,6 +36,14 @@
       "observations": [
         "npm pack in clients/typescript leaves thedoxaway-mcp-client-<version>.tgz in the tree. Untracked and unbanked until the 2026-09-02 fleet sweep; now gitignored so a build artifact can never be committed by accident."
       ]
+    },
+    {
+      "name": "BrandPresenceAudit0928",
+      "entityType": "Decision",
+      "observations": [
+        "Brand presence audit 2026-09-28: the official MCP registry listing io.github.TheDoxaWay/doxa-mcp (versions 1.0.0-1.0.3) had no icons, so registry clients showed a blank tile. server.json 1.0.4 adds icons from doxa.app (favicon.svg any-size + favicon-512x512.png), both the Doxa app icon (white mountains mark on #FF4500, website canon). Publish with mcp-publisher login github -token (gh token of an org member) then mcp-publisher publish; the previous registry JWT in ~/.config/mcp-publisher/token.json had expired. Glama (glama.ai/mcp/servers/The-Doxa-Way/doxa-mcp-schema) already shows the app icon; its meta line still quotes an older README (the Doxa Way journey map, BYOL for unlimited) and refreshes from the repo.",
+        "Correction (review round): Glama's meta line quotes old README text (BYOL for unlimited, free per-individual quota, Scripture, summoned.); the Doxa Way journey map is current README copy. Whether Glama refreshes from the repo is unverified. Icon order: the PNG is icons[0] because clients MUST support PNG but only SHOULD support SVG."
+      ]
     }
   ],
   "relations": []
