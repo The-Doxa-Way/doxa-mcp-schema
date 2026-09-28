@@ -3,12 +3,28 @@
   "name": "io.github.TheDoxaWay/doxa-mcp",
   "title": "Doxa MCP",
   "description": "Christian AI for any question, in any season. Bible (BSB), grace + truth. faith.tools 5/5.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "repository": {
     "url": "https://github.com/The-Doxa-Way/doxa-mcp-schema",
     "source": "github"
   },
   "websiteUrl": "https://doxa.app/mcp",
+  "icons": [
+    {
+      "src": "https://doxa.app/favicon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
+      ]
+    },
+    {
+      "src": "https://doxa.app/favicon-512x512.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ]
+    }
+  ],
   "remotes": [
     {
       "type": "streamable-http",
