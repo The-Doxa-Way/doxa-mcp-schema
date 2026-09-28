@@ -11,17 +11,17 @@
   "websiteUrl": "https://doxa.app/mcp",
   "icons": [
     {
-      "src": "https://doxa.app/favicon.svg",
-      "mimeType": "image/svg+xml",
-      "sizes": [
-        "any"
-      ]
-    },
-    {
       "src": "https://doxa.app/favicon-512x512.png",
       "mimeType": "image/png",
       "sizes": [
         "512x512"
+      ]
+    },
+    {
+      "src": "https://doxa.app/favicon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
       ]
     }
   ],
