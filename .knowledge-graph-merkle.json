@@ -1,5 +1,5 @@
 {
-  "merkleRoot": "7f32c07a513d517c0a018beff724347cca671f9c5a928f07b716cc0710981f73",
+  "merkleRoot": "29b223e0677f9bcedbb82b58c26688f0107e42bb0f86dc20f3f88e76f4a723a5",
   "observations": [
     {
       "hash": "cea4759598e6a97c2fb1dc74d18ca53b7255641b0f0bbe866f1533d3e1ac8b43",
@@ -157,25 +157,25 @@
       "timestamp": "2026-09-28T08:03:11.777Z"
     },
     {
-      "hash": "fdd0db42c200105638fcd71b960774ef16feda72f590a05e166778ae2b8fd78d",
-      "entityName": "RegistryNamespaceTheDoxaWayUser",
-      "content": "2026-10-11: io.github.TheDoxaWay/doxa-mcp is the USER namespace of the separate GitHub user TheDoxaWay, not the The-Doxa-Way org. A garthhiltonwatson login (even as org admin) gets 403 on it. Moving to io.github.The-Doxa-Way/doxa-mcp is blocked: the registry lets only one server own a remote URL, and https://doxa.app/mcp/v1 belongs to the TheDoxaWay name (400 'remote URL ... is already used'). Garth chose to keep the one listing: publish by device login as TheDoxaWay (GitHub account switcher in the garth@doxa.app Chrome profile; its session is not linked to garth@doxa.app Google sign-in, so it needs Garth's sign-in when expired). Corrects BrandPresenceAudit0928 ('gh token of an org member').",
+      "hash": "01a4ad050244fbbc6fb20d2c20a6879adffc473a7d33886e6300ad1bbed7d7dd",
+      "entityName": "RegistryNamespaceOrg",
+      "content": "2026-10-11 (Garth: the org owns it, not the account): Doxa MCP is listed in the official MCP registry as io.github.The-Doxa-Way/doxa-mcp, 1.0.4 published + verified active with both doxa.app icons. Publish: garthhiltonwatson org membership made PUBLIC, then mcp-publisher login github --token \"$(gh auth token)\" (JWT lasts ~5 min) and publish — no browser. Remote URL is https://doxa.app/mcp/v1?src=registry because the registry allows one server per remote URL and the bare URL is owned by the legacy io.github.TheDoxaWay/doxa-mcp (1.0.0-1.0.3), which is the USER namespace of the separate GitHub user TheDoxaWay; only that user can deprecate it. Corrects BrandPresenceAudit0928 ('gh token of an org member' could never publish a user namespace).",
       "provenance": {
         "sourceFile": "PUBLISHING.md",
         "lineNumber": 32,
         "lineRange": null,
-        "fileHash": "5a5cf67261130777e727883fb1d2b63cf62bd3f224d6ab10090ccf54e2e430bc",
-        "totalLines": 107,
-        "extractedAt": "2026-10-11T11:00:28.476Z",
+        "fileHash": "cb4e3102c2a4e587eebce7087b317e47952732fa2fb2405d0ed49aba38f19f0b",
+        "totalLines": 111,
+        "extractedAt": "2026-10-11T11:01:19.308Z",
         "verificationStatus": "verified",
         "extractedBy": "knowledge-graph-merkle.js",
         "entityType": "Decision"
       },
-      "timestamp": "2026-10-11T11:00:28.476Z"
+      "timestamp": "2026-10-11T11:01:19.309Z"
     }
   ],
   "lastVerified": "2026-08-13T14:42:13.135Z",
   "version": 1,
   "createdAt": "2026-08-11T16:37:19.499Z",
-  "lastModified": "2026-10-11T11:00:28.487Z"
+  "lastModified": "2026-10-11T11:01:19.316Z"
 }

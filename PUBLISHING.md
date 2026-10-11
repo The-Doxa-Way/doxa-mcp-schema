@@ -8,7 +8,7 @@ The authoritative registry. AI agents and clients will increasingly discover ser
 
 **Descriptor**: [`server.json`](./server.json) in this repo — already prepared.
 
-**Steps** (3 min, GitHub device login as the `TheDoxaWay` user):
+**Steps** (1 min, no browser):
 
 ```bash
 # 1. Install the publisher CLI (one-time)
@@ -16,10 +16,10 @@ curl -sL https://github.com/modelcontextprotocol/registry/releases/latest/downlo
   | tar -xz -C /tmp
 sudo mv /tmp/mcp-publisher /usr/local/bin/
 
-# 2. Authenticate as the GitHub USER TheDoxaWay (not garthhiltonwatson, not the org).
-#    It prints a code; open https://github.com/login/device in a browser where GitHub
-#    is switched to TheDoxaWay (avatar → two-arrows icon → TheDoxaWay), enter it, Authorize.
-mcp-publisher login github
+# 2. Authenticate with the gh CLI token of a PUBLIC member of The-Doxa-Way org
+#    (once: gh api -X PUT orgs/The-Doxa-Way/public_members/<login>).
+#    The registry JWT lasts ~5 min, so log in right before publishing.
+mcp-publisher login github --token "$(gh auth token)"
 
 # 3. Publish (from the doxa-mcp-schema repo root)
 cd ~/Documents/Projects/doxa-mcp-schema
@@ -27,10 +27,14 @@ mcp-publisher publish
 
 # 4. Verify
 open https://registry.modelcontextprotocol.io
-# Or: curl -s "https://registry.modelcontextprotocol.io/v0/servers/io.github.TheDoxaWay%2Fdoxa-mcp/versions/latest"
+# Or: curl -s "https://registry.modelcontextprotocol.io/v0/servers/io.github.The-Doxa-Way%2Fdoxa-mcp/versions/latest"
 ```
 
-**Namespace**: `io.github.TheDoxaWay/doxa-mcp`. `TheDoxaWay` is a separate GitHub *user* account, not the `The-Doxa-Way` org, so only a login as that user can publish it (an org member gets 403). Do not move to the org namespace: the registry lets one server own a remote URL, and `https://doxa.app/mcp/v1` belongs to this name.
+**Namespace**: `io.github.The-Doxa-Way/doxa-mcp` (from 1.0.4) — the org owns the listing. The registry grants `io.github.<org>/*` only to PUBLIC org members.
+
+**Remote URL**: `https://doxa.app/mcp/v1?src=registry`. The registry lets one server own a remote URL, and the bare `https://doxa.app/mcp/v1` is owned by the legacy listing. The server ignores the query string.
+
+**Legacy listing**: `io.github.TheDoxaWay/doxa-mcp` 1.0.0–1.0.3 belongs to the separate GitHub *user* `TheDoxaWay` (not the org). Only that user can retire it: `mcp-publisher status --status deprecated --all-versions --message "Moved to io.github.The-Doxa-Way/doxa-mcp" io.github.TheDoxaWay/doxa-mcp`.
 
 **Updates later**: bump `version` in `server.json`, run `mcp-publisher publish` again.
 
