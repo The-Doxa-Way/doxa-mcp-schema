@@ -8,7 +8,7 @@ The authoritative registry. AI agents and clients will increasingly discover ser
 
 **Descriptor**: [`server.json`](./server.json) in this repo — already prepared.
 
-**Steps** (5 min, interactive GitHub OAuth):
+**Steps** (1 min, no browser):
 
 ```bash
 # 1. Install the publisher CLI (one-time)
@@ -16,8 +16,9 @@ curl -sL https://github.com/modelcontextprotocol/registry/releases/latest/downlo
   | tar -xz -C /tmp
 sudo mv /tmp/mcp-publisher /usr/local/bin/
 
-# 2. Authenticate via GitHub OAuth (opens browser; sign in as a member of The-Doxa-Way org)
-mcp-publisher login
+# 2. Authenticate with the gh CLI token of a PUBLIC member of The-Doxa-Way org
+#    (make membership public once: gh api -X PUT orgs/The-Doxa-Way/public_members/<login>)
+mcp-publisher login github --token "$(gh auth token)"
 
 # 3. Publish (from the doxa-mcp-schema repo root)
 cd ~/Documents/Projects/doxa-mcp-schema
@@ -28,7 +29,9 @@ open https://registry.modelcontextprotocol.io
 # Search for "doxa" — the listing should appear within a minute
 ```
 
-**Namespace**: `io.github.TheDoxaWay/doxa-mcp` — note the namespace strips the hyphens that appear in the GitHub URL (`The-Doxa-Way`). The MCP Registry recognises the org as `TheDoxaWay`. GitHub OAuth must succeed as an org member for the registry to accept this name.
+**Namespace**: `io.github.The-Doxa-Way/doxa-mcp` — the org login, hyphens kept. The registry grants `io.github.<org>/*` only for orgs where the login's membership is public.
+
+**Legacy name**: versions 1.0.0–1.0.3 were published as `io.github.TheDoxaWay/doxa-mcp`. `TheDoxaWay` is a separate GitHub *user* account (not the org), so only that account can publish or deprecate the legacy name. From 1.0.4 the listing lives under the org name.
 
 **Updates later**: bump `version` in `server.json`, run `mcp-publisher publish` again.
 
