@@ -44,6 +44,13 @@
         "Brand presence audit 2026-09-28: the official MCP registry listing io.github.TheDoxaWay/doxa-mcp (versions 1.0.0-1.0.3) had no icons, so registry clients showed a blank tile. server.json 1.0.4 adds icons from doxa.app (favicon.svg any-size + favicon-512x512.png), both the Doxa app icon (white mountains mark on #FF4500, website canon). Publish with mcp-publisher login github -token (gh token of an org member) then mcp-publisher publish; the previous registry JWT in ~/.config/mcp-publisher/token.json had expired. Glama (glama.ai/mcp/servers/The-Doxa-Way/doxa-mcp-schema) already shows the app icon; its meta line still quotes an older README (the Doxa Way journey map, BYOL for unlimited) and refreshes from the repo.",
         "Correction (review round): Glama's meta line quotes old README text (BYOL for unlimited, free per-individual quota, Scripture, summoned.); the Doxa Way journey map is current README copy. Whether Glama refreshes from the repo is unverified. Icon order: the PNG is icons[0] because clients MUST support PNG but only SHOULD support SVG."
       ]
+    },
+    {
+      "name": "RegistryNamespaceOrg",
+      "entityType": "Decision",
+      "observations": [
+        "2026-10-11 (Garth: the org owns it, not the account): Doxa MCP is listed in the official MCP registry as io.github.The-Doxa-Way/doxa-mcp, 1.0.4 published + verified active with both doxa.app icons. Publish: garthhiltonwatson org membership made PUBLIC, then mcp-publisher login github --token \"$(gh auth token)\" (JWT lasts ~5 min) and publish — no browser. Remote URL is https://doxa.app/mcp/v1?src=registry because the registry allows one server per remote URL and the bare URL is owned by the legacy io.github.TheDoxaWay/doxa-mcp (1.0.0-1.0.3), which is the USER namespace of the separate GitHub user TheDoxaWay; only that user can deprecate it. Corrects BrandPresenceAudit0928 ('gh token of an org member' could never publish a user namespace)."
+      ]
     }
   ],
   "relations": []

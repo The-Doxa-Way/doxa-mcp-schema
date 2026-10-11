@@ -4,10 +4,11 @@
 <!-- Lookup: Grep this file for your topic, then read that   -->
 <!-- entity out of .knowledge-graph/graph.json directly.     -->
 
-## Decision (2)
+## Decision (3)
 
 - BrandPresenceAudit0928 — Brand presence audit 2026-09-28: the official MCP registry listing io.github.TheDoxaWay/doxa-mcp (versions 1.…
 - KgGuardRequiredCheckNaming — The kg-guard job now carries an explicit 'name: KG Guard'. Without it the job reports its check-run under the…
+- RegistryNamespaceOrg — 2026-10-11 (Garth: the org owns it, not the account): Doxa MCP is listed in the official MCP registry as io.g…
 
 ## Fix (2)
 

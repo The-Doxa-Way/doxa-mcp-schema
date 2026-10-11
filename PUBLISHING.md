@@ -8,7 +8,7 @@ The authoritative registry. AI agents and clients will increasingly discover ser
 
 **Descriptor**: [`server.json`](./server.json) in this repo — already prepared.
 
-**Steps** (5 min, interactive GitHub OAuth):
+**Steps** (1 min, no browser):
 
 ```bash
 # 1. Install the publisher CLI (one-time)
@@ -16,8 +16,10 @@ curl -sL https://github.com/modelcontextprotocol/registry/releases/latest/downlo
   | tar -xz -C /tmp
 sudo mv /tmp/mcp-publisher /usr/local/bin/
 
-# 2. Authenticate via GitHub OAuth (opens browser; sign in as a member of The-Doxa-Way org)
-mcp-publisher login
+# 2. Authenticate with the gh CLI token of a PUBLIC member of The-Doxa-Way org
+#    (once: gh api -X PUT orgs/The-Doxa-Way/public_members/<login>).
+#    The registry JWT lasts ~5 min, so log in right before publishing.
+mcp-publisher login github --token "$(gh auth token)"
 
 # 3. Publish (from the doxa-mcp-schema repo root)
 cd ~/Documents/Projects/doxa-mcp-schema
@@ -25,10 +27,14 @@ mcp-publisher publish
 
 # 4. Verify
 open https://registry.modelcontextprotocol.io
-# Search for "doxa" — the listing should appear within a minute
+# Or: curl -s "https://registry.modelcontextprotocol.io/v0/servers/io.github.The-Doxa-Way%2Fdoxa-mcp/versions/latest"
 ```
 
-**Namespace**: `io.github.TheDoxaWay/doxa-mcp` — note the namespace strips the hyphens that appear in the GitHub URL (`The-Doxa-Way`). The MCP Registry recognises the org as `TheDoxaWay`. GitHub OAuth must succeed as an org member for the registry to accept this name.
+**Namespace**: `io.github.The-Doxa-Way/doxa-mcp` (from 1.0.4) — the org owns the listing. The registry grants `io.github.<org>/*` only to PUBLIC org members.
+
+**Remote URL**: `https://doxa.app/mcp/v1?src=registry`. The registry lets one server own a remote URL, and the bare `https://doxa.app/mcp/v1` is owned by the legacy listing. The server ignores the query string.
+
+**Legacy listing**: `io.github.TheDoxaWay/doxa-mcp` 1.0.0–1.0.3 belongs to the separate GitHub *user* `TheDoxaWay` (not the org). Only that user can retire it: `mcp-publisher status --status deprecated --all-versions --message "Moved to io.github.The-Doxa-Way/doxa-mcp" io.github.TheDoxaWay/doxa-mcp`.
 
 **Updates later**: bump `version` in `server.json`, run `mcp-publisher publish` again.
 
