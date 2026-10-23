@@ -72,6 +72,42 @@ ledger="$common/review-attest.jsonl"
 # Candidate SHAs the merge could be landing: HEAD plus every worktree tip.
 tips="$(git rev-parse HEAD 2>/dev/null)
 $(git worktree list --porcelain 2>/dev/null | sed -n 's/^HEAD //p')"
+# PR head resolution (gate-health NO_PR_HEAD_RESOLUTION, 2026-10-24). With
+# only the local tips above, ANY attested local branch admitted ANY PR by
+# number. Narrow the candidates to the merged PR's real head SHA: a wrapper
+# hook's merge_gate_head_sha first, else `gh pr view` on the PR number from
+# the MCP tool (pullNumber) or the `gh pr merge <N|URL>` command. If the head
+# cannot be resolved (no PR ref, gh missing or offline), keep the local tips:
+# fail-open, exactly the old behaviour, never a false block from an outage.
+rg_pr_ref="$(printf '%s' "$payload" | jq -r '(.tool_input.pullNumber // .tool_input.pull_number // empty) | tostring' 2>/dev/null)"
+if [ -z "$rg_pr_ref" ]; then
+  rg_cmd="$(printf '%s' "$payload" | jq -r '.tool_input.command // empty' 2>/dev/null | tr -d "\"'")"
+  set -f
+  # shellcheck disable=SC2086
+  set -- $rg_cmd
+  set +f
+  while [ $# -gt 0 ] && [ "$1" != "merge" ]; do shift; done
+  [ "${1:-}" = "merge" ] && shift
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --repo|-R|--body|-b|--body-file|-F|--subject|-t|--match-head-commit|--author-email) shift; [ $# -gt 0 ] && shift ;;
+      -*) shift ;;
+      '&&'|';'|'|'|'||') break ;;
+      *) rg_pr_ref="$1"; break ;;
+    esac
+  done
+fi
+remote_head_sha="$(printf '%s' "$payload" | jq -r '.merge_gate_head_sha // empty' 2>/dev/null)"
+if [ -z "$remote_head_sha" ] && [ -n "$rg_pr_ref" ] && command -v gh >/dev/null 2>&1; then
+  rg_slug="$(git remote get-url origin 2>/dev/null | sed -E 's#^.*github\.com[:/]##; s#\.git$##')"
+  if [ -n "$rg_slug" ]; then
+    remote_head_sha="$(gh pr view "$rg_pr_ref" --repo "$rg_slug" --json headRefOid -q .headRefOid 2>/dev/null || true)"
+  fi
+fi
+case "$remote_head_sha" in
+  *[!0-9a-f]*|'') ;;
+  *) [ "${#remote_head_sha}" = 40 ] && tips="$remote_head_sha" ;;
+esac
 
 if [ -f "$ledger" ]; then
   while IFS= read -r sha; do

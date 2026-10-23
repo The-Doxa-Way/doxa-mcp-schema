@@ -51,6 +51,13 @@
       "observations": [
         "2026-10-11 (Garth: the org owns it, not the account): Doxa MCP is listed in the official MCP registry as io.github.The-Doxa-Way/doxa-mcp, 1.0.4 published + verified active with both doxa.app icons. Publish: garthhiltonwatson org membership made PUBLIC, then mcp-publisher login github --token \"$(gh auth token)\" (JWT lasts ~5 min) and publish — no browser. Remote URL is https://doxa.app/mcp/v1?src=registry because the registry allows one server per remote URL and the bare URL is owned by the legacy io.github.TheDoxaWay/doxa-mcp (1.0.0-1.0.3), which is the USER namespace of the separate GitHub user TheDoxaWay; only that user can deprecate it. Corrects BrandPresenceAudit0928 ('gh token of an org member' could never publish a user namespace)."
       ]
+    },
+    {
+      "name": "ReviewGatePrHeadResolution",
+      "entityType": "Pattern",
+      "observations": [
+        "2026-10-24: review-gate.sh narrows attestation candidates to the merged PR's real head SHA (wrapper merge_gate_head_sha, else gh pr view on MCP pullNumber or the gh-pr-merge argument); unresolved = fail-open to local tips. Fixes gate-health NO_PR_HEAD_RESOLUTION (any attested local branch admitted any PR by number). Shared snippet with doxa-cns #1844; test scripts/review-gate-head.test.mjs."
+      ]
     }
   ],
   "relations": []
