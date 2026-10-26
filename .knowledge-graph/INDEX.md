@@ -4,11 +4,12 @@
 <!-- Lookup: Grep this file for your topic, then read that   -->
 <!-- entity out of .knowledge-graph/graph.json directly.     -->
 
-## Decision (3)
+## Decision (4)
 
 - BrandPresenceAudit0928 — Brand presence audit 2026-09-28: the official MCP registry listing io.github.TheDoxaWay/doxa-mcp (versions 1.…
 - KgGuardRequiredCheckNaming — The kg-guard job now carries an explicit 'name: KG Guard'. Without it the job reports its check-run under the…
 - RegistryNamespaceOrg — 2026-10-11 (Garth: the org owns it, not the account): Doxa MCP is listed in the official MCP registry as io.g…
+- RegistryRubricClaimHonest — 2026-10-26: the registry listing, README badge and npm client description no longer say 'faith.tools 5/5', wh…
 
 ## Fix (2)
 
