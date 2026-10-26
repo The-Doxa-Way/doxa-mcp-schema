@@ -58,6 +58,13 @@
       "observations": [
         "2026-10-24: review-gate.sh narrows attestation candidates to the merged PR's real head SHA (wrapper merge_gate_head_sha, else gh pr view on MCP pullNumber or the gh-pr-merge argument); unresolved = fail-open to local tips. Fixes gate-health NO_PR_HEAD_RESOLUTION (any attested local branch admitted any PR by number). Shared snippet with doxa-cns #1844; test scripts/review-gate-head.test.mjs."
       ]
+    },
+    {
+      "name": "RegistryRubricClaimHonest",
+      "entityType": "Decision",
+      "observations": [
+        "2026-10-26: the registry listing, README badge and npm client description no longer say 'faith.tools 5/5', which read as a grade from faith.tools. They now say the faith.tools rubric was SELF-RUN by Doxa against the live endpoint (5/5 critical-fail); faith.tools has not graded Doxa. server.json 1.0.5 (description 100 chars, the registry cap). Rule: never describe a self-run check as an independent evaluation. Source: growth radar 2026-10-26 item 2. Follow-on: doxa.app blog posts (add-bible-mcp-claude-desktop-60-seconds, choosing-a-christian-mcp, christian-ai-what-to-look-for-2026) still say 'independently evaluated'."
+      ]
     }
   ],
   "relations": []

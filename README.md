@@ -14,14 +14,14 @@
   <a href="https://github.com/The-Doxa-Way/doxa-mcp-schema/blob/main/LICENSE"><img src="https://img.shields.io/github/license/The-Doxa-Way/doxa-mcp-schema?color=2563eb" alt="MIT License" /></a>
   <img src="https://img.shields.io/badge/MCP-2024--11--05-1d4ed8" alt="MCP 2024-11-05" />
   <img src="https://img.shields.io/badge/tools-3-f97316" alt="3 tools" />
-  <img src="https://img.shields.io/badge/faith.tools-5%2F5-22c55e" alt="faith.tools 5/5" />
+  <img src="https://img.shields.io/badge/faith.tools_rubric%2C_self--run-5%2F5-22c55e" alt="faith.tools rubric, self-run: 5/5" />
   <img src="https://img.shields.io/badge/install-60s-f97316" alt="Install in 60s" />
 </p>
 
 <p align="center">
   <a href="https://doxa.app">Get the Doxa app</a> &middot;
   <a href="https://t.me/TheDoxaWayBot">Doxa on Telegram</a> &middot;
-  <a href="#faith-tools-evaluation">faith.tools 5/5</a>
+  <a href="#faith-tools-evaluation">Self-run faith.tools rubric: 5/5</a>
 </p>
 
 ---
@@ -37,7 +37,7 @@ Points to Jesus, never to itself. Points to real human community, not to more AI
 - **Encouragement** anchored in Scripture and real testimonies
 - **Scripture lookup**: 31,000+ verses from the Berean Standard Bible (public domain) with deep links to `doxa.app/bible/...`
 - **The Doxa Way**: the journey map, structured and anchored in Scripture
-- **Independently evaluated**: 5/5 on the [faith.tools](https://faith.tools) Christian-AI rubric, including the crisis-handling test. [Public transcripts](./evaluation/faith-tools-rubric.md).
+- **Tested in the open**: we ran the [faith.tools](https://faith.tools) unofficial Christian-AI rubric against the live endpoint and passed all 5 critical-fail questions, including the crisis-handling test. faith.tools did not grade Doxa; anyone can re-run it. [Public transcripts](./evaluation/faith-tools-rubric.md).
 
 > Install: copy 4 lines into your MCP config, restart, done.
 
@@ -189,9 +189,9 @@ JSON Schemas (Draft 2020-12) live in [`schemas/`](./schemas). Working request/re
 
 ## Faith.Tools evaluation
 
-The [faith.tools](https://faith.tools) rubric is the only published independent Christian-AI safety evaluation. It defines 20 questions; 5 are critical-fail tests where any single failure flags the app.
+The [faith.tools](https://faith.tools) rubric is a published, independent Christian-AI safety rubric. Doxa ran it against its own live endpoint; faith.tools has not graded Doxa. It defines 20 questions; 5 are critical-fail tests where any single failure flags the app.
 
-**Doxa MCP scores 5/5 on the critical-fail tests.** Full transcripts in [`evaluation/faith-tools-rubric.md`](./evaluation/faith-tools-rubric.md).
+**In that self-run, Doxa MCP passes 5/5 critical-fail tests.** Full transcripts in [`evaluation/faith-tools-rubric.md`](./evaluation/faith-tools-rubric.md).
 
 | Rule | What it requires | Doxa MCP |
 |---|---|---|
@@ -266,11 +266,11 @@ If your integration needs to remove the footer (white-label, internal B2B), emai
 
 ## Status and roadmap
 
-**v1.0.3**: Three tools, hosted, independently evaluated.
+**v1.0.3**: Three tools, hosted, tested in the open.
 
 - `doxa_encourage`, `doxa_scripture`, `doxa_way_movement`
 - Anthropic MCP Registry v1.0.3
-- faith.tools 5/5 with public transcripts
+- Self-run faith.tools rubric: 5/5, with public transcripts
 - Listed on Anthropic Registry, Cursor, Smithery, mcp.so, Glama, npm
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to suggest features or flag issues.
