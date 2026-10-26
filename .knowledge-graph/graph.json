@@ -63,7 +63,8 @@
       "name": "RegistryRubricClaimHonest",
       "entityType": "Decision",
       "observations": [
-        "2026-10-26: the registry listing, README badge and npm client description no longer say 'faith.tools 5/5', which read as a grade from faith.tools. They now say the faith.tools rubric was SELF-RUN by Doxa against the live endpoint (5/5 critical-fail); faith.tools has not graded Doxa. server.json 1.0.5 (description 100 chars, the registry cap). Rule: never describe a self-run check as an independent evaluation. Source: growth radar 2026-10-26 item 2. Follow-on: doxa.app blog posts (add-bible-mcp-claude-desktop-60-seconds, choosing-a-christian-mcp, christian-ai-what-to-look-for-2026) still say 'independently evaluated'."
+        "2026-10-26: the registry listing, README badge and npm client description no longer say 'faith.tools 5/5', which read as a grade from faith.tools. They now say the faith.tools rubric was SELF-RUN by Doxa against the live endpoint (5/5 critical-fail); faith.tools has not graded Doxa. server.json 1.0.5 (description 100 chars, the registry cap). Rule: never describe a self-run check as an independent evaluation. Source: growth radar 2026-10-26 item 2. Follow-on: doxa.app blog posts (add-bible-mcp-claude-desktop-60-seconds, choosing-a-christian-mcp, christian-ai-what-to-look-for-2026) still say 'independently evaluated'.",
+        "Publish state at merge (2026-10-26): registry 1.0.5 is published by mcp-publisher after this PR merges. npm @thedoxaway/mcp-client 0.2.5 carries the fixed description but is NOT published yet: this Mac has no npm login (E401); live npm 0.2.4 still says 'independent faith.tools rubric' until the next npm publish."
       ]
     }
   ],

@@ -21,7 +21,7 @@
 <p align="center">
   <a href="https://doxa.app">Get the Doxa app</a> &middot;
   <a href="https://t.me/TheDoxaWayBot">Doxa on Telegram</a> &middot;
-  <a href="#faith-tools-evaluation">Self-run faith.tools rubric: 5/5</a>
+  <a href="#faithtools-evaluation">Self-run faith.tools rubric: 5/5</a>
 </p>
 
 ---
@@ -189,7 +189,7 @@ JSON Schemas (Draft 2020-12) live in [`schemas/`](./schemas). Working request/re
 
 ## Faith.Tools evaluation
 
-The [faith.tools](https://faith.tools) rubric is a published, independent Christian-AI safety rubric. Doxa ran it against its own live endpoint; faith.tools has not graded Doxa. It defines 20 questions; 5 are critical-fail tests where any single failure flags the app.
+The [faith.tools](https://faith.tools) rubric (Cameron Pak's unofficial rules for AI apps for Christians) is a published Christian-AI safety rubric. Doxa ran it against its own live endpoint; faith.tools has not graded Doxa. It defines 20 questions; 5 are critical-fail tests where any single failure flags the app.
 
 **In that self-run, Doxa MCP passes 5/5 critical-fail tests.** Full transcripts in [`evaluation/faith-tools-rubric.md`](./evaluation/faith-tools-rubric.md).
 
@@ -266,12 +266,12 @@ If your integration needs to remove the footer (white-label, internal B2B), emai
 
 ## Status and roadmap
 
-**v1.0.3**: Three tools, hosted, tested in the open.
+**v1.0.5**: Three tools, hosted, tested in the open.
 
 - `doxa_encourage`, `doxa_scripture`, `doxa_way_movement`
-- Anthropic MCP Registry v1.0.3
+- Official MCP Registry v1.0.5
 - Self-run faith.tools rubric: 5/5, with public transcripts
-- Listed on Anthropic Registry, Cursor, Smithery, mcp.so, Glama, npm
+- Listed on the Official MCP Registry, Cursor, Smithery, mcp.so, Glama, npm
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to suggest features or flag issues.
 

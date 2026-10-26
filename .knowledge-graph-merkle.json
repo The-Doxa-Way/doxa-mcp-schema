@@ -1,5 +1,5 @@
 {
-  "merkleRoot": "8163809be89adb351f64b4bcfd6da8a0518a34ad3850afcbacad5f19a7efda2c",
+  "merkleRoot": "77dcd173697eb5e4cb49f3a43dd0bf8cb022124b85604811ce60649c0d3f0549",
   "observations": [
     {
       "hash": "cea4759598e6a97c2fb1dc74d18ca53b7255641b0f0bbe866f1533d3e1ac8b43",
@@ -206,10 +206,26 @@
         "entityType": "Decision"
       },
       "timestamp": "2026-10-26T19:37:54.285Z"
+    },
+    {
+      "hash": "99b9916934d8817cc64e942b5f1998b2bb1b1bdd7340ce97c41d1ec102e63520",
+      "entityName": "RegistryRubricClaimHonest",
+      "content": "Publish state at merge (2026-10-26): registry 1.0.5 is published by mcp-publisher after this PR merges. npm @thedoxaway/mcp-client 0.2.5 carries the fixed description but is NOT published yet: this Mac has no npm login (E401); live npm 0.2.4 still says 'independent faith.tools rubric' until the next npm publish.",
+      "provenance": {
+        "sourceFile": "clients/typescript/package.json",
+        "lineNumber": 3,
+        "lineRange": null,
+        "fileHash": "7a3f86d42bb6e788bc4c115f8bb980d4bebb92b861ebc3d63dc79018f590f58f",
+        "totalLines": 69,
+        "extractedAt": "2026-10-26T19:44:11.609Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js"
+      },
+      "timestamp": "2026-10-26T19:44:11.610Z"
     }
   ],
-  "lastVerified": "2026-08-13T14:42:13.135Z",
+  "lastVerified": "2026-10-26T19:40:22.124Z",
   "version": 1,
   "createdAt": "2026-08-11T16:37:19.499Z",
-  "lastModified": "2026-10-26T19:37:54.304Z"
+  "lastModified": "2026-10-26T19:44:11.610Z"
 }

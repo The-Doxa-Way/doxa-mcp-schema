@@ -1,6 +1,6 @@
 {
   "name": "@thedoxaway/mcp-client",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Tiny TypeScript client for Doxa MCP, a Christian AI for any question, in any season. Truth that points to Jesus and to real relationships. Bible lookup (BSB), real testimonies, encouragement, apologetics. Passes a self-run check of the faith.tools rubric (5/5). Works with Claude, Cursor, Cline, any MCP-aware AI client.",
   "keywords": [
     "mcp",
