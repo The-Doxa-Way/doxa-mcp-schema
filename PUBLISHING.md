@@ -36,7 +36,7 @@ open https://registry.modelcontextprotocol.io
 
 **Legacy listing**: `io.github.TheDoxaWay/doxa-mcp` 1.0.0–1.0.3 belongs to the separate GitHub *user* `TheDoxaWay` (not the org). Only that user can retire it: `mcp-publisher status --status deprecated --all-versions --message "Moved to io.github.The-Doxa-Way/doxa-mcp" io.github.TheDoxaWay/doxa-mcp`.
 
-**Updates later**: bump `version` in `server.json`, run `mcp-publisher publish` again.
+**Updates later**: bump `version` in `server.json`, run `mcp-publisher publish` again, then deprecate the version it replaces: `mcp-publisher status --status deprecated --message "Superseded by <new>" io.github.The-Doxa-Way/doxa-mcp <old>`. A replaced version stays `active` and keeps showing its old description in registry search until you do (on 2026-10-27, 1.0.4 still showed "faith.tools 5/5" after 1.0.5 had removed it).
 
 ---
 
