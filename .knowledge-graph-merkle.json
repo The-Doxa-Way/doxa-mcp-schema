@@ -1,5 +1,5 @@
 {
-  "merkleRoot": "269422d7351ff44eac2975266e1e1f358f11238ce3dde0653a610ed9a9cf0e29",
+  "merkleRoot": "5781638561b4eee1044d5b9ef7cb8ef98c414c1f0ef69388e69d75a867bb1baa",
   "observations": [
     {
       "hash": "cea4759598e6a97c2fb1dc74d18ca53b7255641b0f0bbe866f1533d3e1ac8b43",
@@ -238,10 +238,27 @@
         "extractedBy": "knowledge-graph-merkle.js"
       },
       "timestamp": "2026-10-27T04:32:02.991Z"
+    },
+    {
+      "hash": "63e9df1c74ad31371270ba84140a699cc20bf72862a446614aa4880e33455b1b",
+      "entityName": "FleetSecurityBaseline20261103",
+      "content": "2026-11-03 fleet security baseline (doxa-cns config/fleet.yaml): .github/workflows/secret-scan.yml runs gitleaks 8.30.1 (job id 'gitleaks' = required check of the org ruleset 'fleet: PR + secret scan') on PR commits, and on all history weekly (Mon 04:17 UTC) and on dispatch; config .gitleaks.toml (default rules); classified history findings live in .gitleaksignore pinned to their commit. .github/dependabot.yml: weekly, limit 5, minor+patch grouped. Dependabot ecosystems: npm /server, npm /clients/typescript, github-actions. Full-history scan: 0 findings.",
+      "provenance": {
+        "sourceFile": ".github/workflows/secret-scan.yml",
+        "lineNumber": 1,
+        "lineRange": null,
+        "fileHash": "af9088771b015861fed3514c1feab7e06a2e0b4710f35f9eee8c0557d19b2b51",
+        "totalLines": 80,
+        "extractedAt": "2026-11-03T09:12:32.435Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "Decision"
+      },
+      "timestamp": "2026-11-03T09:12:32.436Z"
     }
   ],
-  "lastVerified": "2026-10-27T04:32:07.466Z",
+  "lastVerified": "2026-11-03T09:12:39.907Z",
   "version": 1,
   "createdAt": "2026-08-11T16:37:19.499Z",
-  "lastModified": "2026-10-27T04:32:07.466Z"
+  "lastModified": "2026-11-03T09:12:39.908Z"
 }
