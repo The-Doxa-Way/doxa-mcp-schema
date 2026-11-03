@@ -1,0 +1,13 @@
+# gitleaks config for doxa-mcp-schema (.github/workflows/secret-scan.yml). gitleaks' default rules, minus
+# generated files and dependency trees. Findings already in history are classified one by one in
+# .gitleaksignore; nothing is allowlisted by value or by test-file path, so a new secret anywhere
+# still fails the scan.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Generated files and dependency trees, never hand-written"
+paths = [
+  '''(^|/)package-lock\.json$''',
+]
