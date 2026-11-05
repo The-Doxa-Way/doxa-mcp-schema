@@ -60,7 +60,7 @@ repo="$(printf '%s' "$payload" | jq -r '.tool_input.repo // empty' 2>/dev/null)"
 cmd="$(printf '%s' "$payload" | jq -r '.tool_input.command // empty' 2>/dev/null)"
 
 # The PR being merged (same parse as review-gate.sh).
-pr_ref="$(printf '%s' "$payload" | jq -r '(.tool_input.pullNumber // .tool_input.pull_number // empty) | tostring' 2>/dev/null)"
+pr_ref="$(printf '%s' "$payload" | jq -r '(.tool_input.pullNumber // .tool_input.pull_number // empty) | if type == "number" then floor else . end | tostring' 2>/dev/null)"
 if [ -z "$pr_ref" ] && [ -n "$cmd" ]; then
   pr_cmd="$(printf '%s' "$cmd" | tr -d "\"'(){}\`")"
   set -f
@@ -185,12 +185,14 @@ $local_head_sha"
 fi
 # A direct push lands THIS worktree's HEAD — the exact tip, no fallback needed.
 [ "$landing" = push ] && tips="$(git rev-parse HEAD 2>/dev/null)"
-# The PR's real file list when its head is NOT judgeable locally (unfetchable):
-# judged on GitHub's own list below, IN ADDITION to the all-tips fallback
-# (browser-extension / discord-bot fix — a local tip cannot be trusted to be
-# the PR being merged).
+# The PR's real file list (GitHub's own), judged below IN ADDITION to the
+# local tip(s) — ALWAYS on a merge with a resolvable PR, not only when the
+# head is unfetchable (browser-extension / discord-bot fix, kept whole by the
+# rollout review 2026-11-05): a local diff runs against a possibly stale local
+# origin/<base>, so test files that came in from a base merged into the PR
+# could pass as the PR's own tests. GitHub's list cannot be fooled that way.
 remote_changed=""
-if [ -z "$tips" ] && [ -n "$pr_ref" ] && [ -n "$gh_slug" ]; then
+if [ "$landing" = merge ] && [ -n "$pr_ref" ] && [ -n "$gh_slug" ]; then
   remote_changed="$(bounded 15 gh pr diff "$pr_ref" --repo "$gh_slug" --name-only 2>/dev/null || true)"
 fi
 # Otherwise: HEAD plus every worktree tip; the merge could land any of them.

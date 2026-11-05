@@ -272,11 +272,30 @@ if [ "$tool_name" = "mcp__github__merge_pull_request" ]; then
   # A detector WITHOUT --remote-pr: fall back to the LOCAL range of this
   # project's own checkout (openclaw / doxa-shared / scripture-grounding-mcp
   # 2026-08-13), run only AFTER the sibling bail, so a sibling merge is never
-  # judged by this checkout's state. Deliberately CLAUDE_PROJECT_DIR, never
-  # payload.cwd: the Bash tool's cwd drifts with `cd` and could point at a
-  # sibling's worktree; CLAUDE_PROJECT_DIR does not drift. Unset -> skip.
-  if [ "$mcp_remote_integrity" -eq 0 ] && [ -n "${CLAUDE_PROJECT_DIR:-}" ]; then
-    merge_integrity_local "$CLAUDE_PROJECT_DIR"
+  # judged by this checkout's state. CLAUDE_PROJECT_DIR always (it does not
+  # drift); payload.cwd TOO when it is a checkout of THIS repo (a linked
+  # worktree where a merkle conflict was just resolved — the doxa-shared and
+  # scripture-grounding-mcp hand copies checked it, rollout review 2026-11-05).
+  # The Bash tool's cwd drifts with `cd`, so a cwd in a sibling repo is never
+  # judged here. Both unset/foreign -> skip. Residual (accepted, as in those
+  # copies): payload.cwd is the session's checkout, not the PR's branch, so a
+  # real dropped observation there blocks an unrelated MCP merge until fixed.
+  if [ "$mcp_remote_integrity" -eq 0 ]; then
+    [ -n "${CLAUDE_PROJECT_DIR:-}" ] && merge_integrity_local "$CLAUDE_PROJECT_DIR"
+    mcp_cwd="$(printf '%s' "$payload" | jq -r '.cwd // empty' 2>/dev/null)"
+    if [ -n "$mcp_cwd" ] && [ -d "$mcp_cwd" ] && [ "$mcp_cwd" != "${CLAUDE_PROJECT_DIR:-}" ]; then
+      mcp_cwd_origin="$(git -C "$mcp_cwd" remote get-url origin 2>/dev/null)"
+      mcp_cwd_self=0
+      case "$mcp_cwd_origin" in
+        *github*)
+          is_self_repo_name "$(printf '%s' "$mcp_cwd_origin" | sed -E 's#/+$##; s#\.git$##; s#^.*[:/]##')" && mcp_cwd_self=1 ;;
+        *)
+          mcp_cwd_common="$(git -C "$mcp_cwd" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
+          mcp_proj_common="$(git -C "${CLAUDE_PROJECT_DIR:-$PWD}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
+          [ -n "$mcp_cwd_common" ] && [ "$mcp_cwd_common" = "$mcp_proj_common" ] && mcp_cwd_self=1 ;;
+      esac
+      [ "$mcp_cwd_self" -eq 1 ] && merge_integrity_local "$mcp_cwd"
+    fi
   fi
 
   # Ask GitHub what this PR actually contains, rather than inferring it from

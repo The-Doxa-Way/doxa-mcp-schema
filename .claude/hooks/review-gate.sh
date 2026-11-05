@@ -84,7 +84,7 @@ cmd="$(printf '%s' "$payload" | jq -r '.tool_input.command // empty' 2>/dev/null
 # stripped so a quoted ref still parses. Anchored on the `gh pr merge` token
 # triple, not the first `merge` word: `git merge x && gh pr merge 5` must
 # resolve PR 5, never branch x.
-rg_pr_ref="$(printf '%s' "$payload" | jq -r '(.tool_input.pullNumber // .tool_input.pull_number // empty) | tostring' 2>/dev/null)"
+rg_pr_ref="$(printf '%s' "$payload" | jq -r '(.tool_input.pullNumber // .tool_input.pull_number // empty) | if type == "number" then floor else . end | tostring' 2>/dev/null)"
 if [ -z "$rg_pr_ref" ] && [ -n "$cmd" ]; then
   rg_cmd="$(printf '%s' "$cmd" | tr -d "\"'(){}\`")"
   set -f

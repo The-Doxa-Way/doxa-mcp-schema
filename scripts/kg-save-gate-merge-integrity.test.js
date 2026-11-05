@@ -130,6 +130,12 @@ function repoWithCorrectMerge() {
     { hash: 'h2', entityName: 'Two', content: 'c', provenance: {}, timestamp: '2026-01-02T00:00:00.000Z' },
     { hash: 'h3', entityName: 'Three', content: 'c', provenance: {}, timestamp: '2026-01-03T00:00:00.000Z' },
   ]));
+  // A real kg-save in the range: only .knowledge-graph/ counts (canonical
+  // fleet gate, 2026-11-05 — a lone merkle-file edit is not a kg-save, the
+  // same test KG Guard CI applies), so the run isolates the merge-integrity
+  // check instead of tripping the no-kg-save block further down.
+  fs.mkdirSync(path.join(dir, '.knowledge-graph'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.knowledge-graph', 'graph.json'), '{"entities":[]}\n');
   git(['add', '-A'], dir);
   git(['commit', '-qm', 'Merge feature into main (correct union)'], dir);
 
@@ -141,11 +147,18 @@ function repoWithCorrectMerge() {
 // the run reaches the hand-authored/kg-change tail of the hook rather than
 // bailing early on an unrelated-repo check — the merge-integrity check must
 // still fire (and block) regardless of what happens further down.
+// A `gh` that answers nothing (KG Guard reads ABSENT): hermetic — the hook's
+// KG Guard lookup must never reach a live PR of this repo (rollout review
+// 2026-11-05: the union test passed only while live PR #4 was green).
+const GH_STUB_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'ghbin-'));
+fs.writeFileSync(path.join(GH_STUB_DIR, 'gh'), '#!/bin/bash\nexit 0\n', { mode: 0o755 });
+process.on('exit', () => fs.rmSync(GH_STUB_DIR, { recursive: true, force: true }));
+
 function runGate(dir, cmd) {
   try {
     execFileSync('bash', [HOOK], {
       cwd: dir,
-      env: { ...process.env, CLAUDE_PROJECT_DIR: dir },
+      env: { ...process.env, CLAUDE_PROJECT_DIR: dir, PATH: `${GH_STUB_DIR}:${process.env.PATH}` },
       input: JSON.stringify({ tool_input: { command: cmd }, cwd: dir }),
       stdio: ['pipe', 'pipe', 'pipe'],
     });
