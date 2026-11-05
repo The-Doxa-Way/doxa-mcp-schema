@@ -12,10 +12,19 @@ name: KG Guard
 
 on:
   pull_request:
-    # labeled/unlabeled included so adding the skip-kg label re-runs the check
-    # (default types would leave a failed check stale after labeling).
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    # labeled/unlabeled included so adding the skip-kg label re-runs the check,
+    # and edited so adding [skip-kg] to the TITLE re-runs it too (2026-08-31:
+    # doxa-app#1324 gained [skip-kg] by title edit and the red verdict stayed
+    # stale — default types would leave a failed check stale either way).
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
     branches: [main]
+
+# A superseded run is cancelled on the next push to the same PR (2026-09-13:
+# 219 runs in 7 days, most of them per-push on the fleet's own PR chains — the
+# stale ones were finishing for nothing).
+concurrency:
+  group: kg-guard-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check:
@@ -25,13 +34,67 @@ jobs:
     # happens to id a job "check", and meaningless in the PR checks list.
     name: KG Guard
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    # 12 (S4a 2026-11-05: doxa-app's value, the highest copy; a cancelled run
+    # reads as RED and blocks the merge, so the limit errs high). Was 10 here
+    # (2026-10-27), 6 since 2026-10-09, 3 before: a full fetch of every blob
+    # passed 6 min and showed as "cancelled". The checkout is now blobless too.
+    timeout-minutes: 12
     if: ${{ github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]' }}
 
     steps:
-      - uses: actions/checkout@v4
+      # Blobless (2026-10-27, as gate/classify in #2007): the full fetch of every
+      # ref with every blob (1.7 GB) passed 6 min and was cancelled. The checks
+      # read only the diff and single files, which git fetches on demand.
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          filter: blob:none
+
+      # Pinned rather than relying on the runner's preinstalled node: the KG
+      # checks below are node scripts (check-kg-integrity.mjs uses
+      # import.meta.dirname, which needs 20.11+), and a runner image change must
+      # not silently turn this gate into an infrastructure error.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      # 2026-09-27 (doxa-openclaw): a KG writeback re-appended 20 already-present
+      # entities (exact-duplicate objects, same name+type+observations) and no
+      # gate caught it before merge — doxa-cns's daily cns-audit caught it a day
+      # later, after federation had already refused the pull
+      # (source-sync-failed). This step runs unconditionally (no [skip-kg]
+      # exemption — a corrupt graph is corrupt whether or not this PR itself
+      # carries a kg-save) so the class is caught at the one chokepoint every
+      # merge crosses, not a day later by a cross-repo alert.
+      - name: Reject duplicate entity names in graph.json
+        run: |
+          node -e '
+            const fs = require("fs");
+            const p = ".knowledge-graph/graph.json";
+            let d;
+            try {
+              d = JSON.parse(fs.readFileSync(p, "utf8"));
+            } catch (e) {
+              console.error("::error::" + p + " failed to parse as JSON: " + e.message);
+              process.exit(1);
+            }
+            if (!d || !Array.isArray(d.entities)) {
+              console.error("::error::" + p + " has no entities array");
+              process.exit(1);
+            }
+            const seen = new Map();
+            const dupes = [];
+            d.entities.forEach((e, i) => {
+              if (seen.has(e.name)) dupes.push([e.name, seen.get(e.name), i]);
+              else seen.set(e.name, i);
+            });
+            if (dupes.length) {
+              console.error("::error::" + dupes.length + " duplicate entity name(s) in " + p + ":");
+              dupes.forEach(([name, a, b]) => console.error("  " + name + " (indexes " + a + " and " + b + ")"));
+              process.exit(1);
+            }
+            console.log("no duplicate entity names (" + d.entities.length + " entities)");
+          '
 
       - name: Require a kg-save with the merged work
         run: |
@@ -47,11 +110,19 @@ jobs:
 
           BASE=$(jq -r '.pull_request.base.sha' "$EV")
           HEAD=$(jq -r '.pull_request.head.sha' "$EV")
-          if ! CHANGED=$(git diff --name-only "$BASE"..."$HEAD"); then
+          # Freshest base: the PR merge commit's first parent. actions/checkout
+          # builds the merge commit (parents: base tip, head); the event's
+          # base.sha is stale on a re-run.
+          if [ "$(git rev-parse -q --verify 'HEAD^2' || true)" = "$HEAD" ]; then BASE=$(git rev-parse 'HEAD^1'); fi
+          if ! CHANGED=$(git diff --name-status --no-renames "$BASE"..."$HEAD"); then
             echo "::error::git diff $BASE...$HEAD failed — infra problem, not a missing kg-save."
             exit 1
           fi
-          if echo "$CHANGED" | grep -q '^\.knowledge-graph/'; then
+
+          # Any .knowledge-graph/ change is this repo's kg-save (no pending
+          # fragments here yet). awk reads all input (no grep -q early exit ->
+          # SIGPIPE under pipefail, which would read as "no kg-save").
+          if printf '%s\n' "$CHANGED" | awk -F'\t' '$2 ~ /^\.knowledge-graph\// {f=1} END {exit !f}'; then
             echo "kg-save present in this PR."
             exit 0
           fi
@@ -60,7 +131,7 @@ jobs:
           echo ""
           echo "Bank what this PR changed and why, in this branch:"
           echo '  node scripts/knowledge-graph-merkle.js add "<EntityName>" "<what changed + why it matters>" <source-file> --type <Type>'
-          echo "then commit the .knowledge-graph/ update into this PR."
+          echo "then commit the .knowledge-graph/ change it writes into this PR."
           echo ""
           echo "Genuinely knowledge-free change (typo, generated state)? Add [skip-kg] to the"
           echo "PR title or the skip-kg label — the exemption stays visible in the PR record."

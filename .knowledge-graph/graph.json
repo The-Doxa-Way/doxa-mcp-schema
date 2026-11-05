@@ -74,6 +74,13 @@
       "observations": [
         "2026-11-03 fleet security baseline (doxa-cns config/fleet.yaml): .github/workflows/secret-scan.yml runs gitleaks 8.30.1 (job id 'gitleaks' = required check of the org ruleset 'fleet: PR + secret scan') on PR commits, and on all history weekly (Mon 04:17 UTC) and on dispatch; config .gitleaks.toml (default rules); classified history findings live in .gitleaksignore pinned to their commit. .github/dependabot.yml: weekly, limit 5, minor+patch grouped. Dependabot ecosystems: npm /server, npm /clients/typescript, github-actions. Full-history scan: 0 findings."
       ]
+    },
+    {
+      "name": "CanonicalFleetGates",
+      "entityType": "Workflow",
+      "observations": [
+        "2026-11-05: this repo's five fleet gates (kg-save-gate.sh, review-gate.sh, test-gate.sh, scripts/attest-review.sh, kg-guard.yml) are now GENERATED from The-Doxa-Way-CNS fleet/gates/*.tmpl by scripts/generate-fleet-gates.mjs --repo doxa-mcp-schema (decision docs/decisions/2026-11-05-canonical-fleet-gates.md; template fix PR #2379). Never hand-edit them here: fix the template and regenerate; check-hook-drift.mjs compares this copy on main daily. What the old copy lacked: old attest-review.sh had no blocked: rule; kg-guard.yml grep-under-pipefail; scripts/kg-save-gate-merge-integrity.test.js union test passed only because live PR #4 was green — now a stub gh and a real kg change (hermetic). Carries Wamemba me's no-re-review-of-a-blocked-commit rule: attest-review.sh 'blocked: <findings>' records SHA+tree and that code can never be attested."
+      ]
     }
   ],
   "relations": []
