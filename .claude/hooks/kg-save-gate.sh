@@ -53,6 +53,17 @@ is_self_repo_name() {   # $1 = a GitHub repo name (no owner)
   case " $self_names_lc " in *" $n "*) return 0 ;; esac
   return 1
 }
+# is_self_repo_url <GitHub remote URL>: owner The-Doxa-Way AND a self name. The name
+# alone admits a same-named fork under any owner, whose own checker this hook
+# would then run (Vercel Security Review, 2026-11-05).
+self_org_lc="$(printf '%s' 'The-Doxa-Way' | tr '[:upper:]' '[:lower:]')"
+is_self_repo_url() {
+  local p o
+  p="$(printf '%s' "$1" | sed -E 's#/+$##; s#\.git$##')"
+  o="${p%[:/]*}"; o="${o##*[:/]}"
+  [ "$(printf '%s' "$o" | tr '[:upper:]' '[:lower:]')" = "$self_org_lc" ] || return 1
+  is_self_repo_name "${p##*[:/]}"
+}
 
 # bounded <secs> <cmd…> — every network call here is bounded (doxa-app
 # 2026-08): an unbounded `gh` (expired auth, DNS hang, stalled proxy) would sit
@@ -258,7 +269,7 @@ if [ "$tool_name" = "mcp__github__merge_pull_request" ]; then
   fi
   # ---------------------------------------------------------------------------
 
-  if ! is_self_repo_name "$mcp_repo"; then
+  if ! is_self_repo_url "github.com/$mcp_owner/$mcp_repo"; then
     # Sibling MCP merge (2026-08-11 rule): same KG Guard verdict check as the
     # Bash merge path — a red/pending check blocks in ANY repo. ABSENT fails
     # open here (no local range exists to fall back to for a sibling).
@@ -288,7 +299,7 @@ if [ "$tool_name" = "mcp__github__merge_pull_request" ]; then
       mcp_cwd_self=0
       case "$mcp_cwd_origin" in
         *github*)
-          is_self_repo_name "$(printf '%s' "$mcp_cwd_origin" | sed -E 's#/+$##; s#\.git$##; s#^.*[:/]##')" && mcp_cwd_self=1 ;;
+          is_self_repo_url "$mcp_cwd_origin" && mcp_cwd_self=1 ;;
         *)
           mcp_cwd_common="$(git -C "$mcp_cwd" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
           mcp_proj_common="$(git -C "${CLAUDE_PROJECT_DIR:-$PWD}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
@@ -409,9 +420,9 @@ git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 # Only gate the doxa-mcp-schema repo itself; allow landings that operate on other
 # repos. Identity, in order:
 #   1. A GitHub origin names the repo (doxa-app's rule): this repo iff the
-#      name is doxa-mcp-schema / doxa-mcp-schema, any case. Linked worktrees share the config,
-#      and a separate CLONE of this repo — which has its own common dir — is
-#      still this repo.
+#      owner is The-Doxa-Way and the name is doxa-mcp-schema / doxa-mcp-schema, any case. Linked
+#      worktrees share the config, and a separate CLONE of this repo — which
+#      has its own common dir — is still this repo. A same-named fork is not.
 #   2. Otherwise compare via --git-common-dir (resolves to the MAIN checkout's
 #      .git dir for any linked worktree of the same repo), NOT
 #      --show-toplevel: two worktrees of the SAME repo have different
@@ -434,7 +445,7 @@ origin_url="$(git remote get-url origin 2>/dev/null)"
 self_repo=1
 case "$origin_url" in
   *github*)
-    is_self_repo_name "$(printf '%s' "$origin_url" | sed -E 's#/+$##; s#\.git$##; s#^.*[:/]##')" || self_repo=0 ;;
+    is_self_repo_url "$origin_url" || self_repo=0 ;;
   *)
     [ -n "$proj_common" ] && [ "$repo_common" != "$proj_common" ] && self_repo=0 ;;
 esac

@@ -81,6 +81,13 @@
       "observations": [
         "2026-11-05: this repo's five fleet gates (kg-save-gate.sh, review-gate.sh, test-gate.sh, scripts/attest-review.sh, kg-guard.yml) are now GENERATED from The-Doxa-Way-CNS fleet/gates/*.tmpl by scripts/generate-fleet-gates.mjs --repo doxa-mcp-schema (decision docs/decisions/2026-11-05-canonical-fleet-gates.md; template fix PR #2379). Never hand-edit them here: fix the template and regenerate; check-hook-drift.mjs compares this copy on main daily. What the old copy lacked: old attest-review.sh had no blocked: rule; kg-guard.yml grep-under-pipefail; scripts/kg-save-gate-merge-integrity.test.js union test passed only because live PR #4 was green — now a stub gh and a real kg change (hermetic). Carries Wamemba me's no-re-review-of-a-blocked-commit rule: attest-review.sh 'blocked: <findings>' records SHA+tree and that code can never be attested."
       ]
+    },
+    {
+      "name": "FleetGates",
+      "entityType": "Reference",
+      "observations": [
+        "2026-11-05: re-rendered the gate hooks from The-Doxa-Way-CNS fleet/gates templates at 971d0c9245 (CNS #2417, #2391). Merge-message text is data; the repo of a merge comes only from that merge's own command; any doubt applies this repo's gates."
+      ]
     }
   ],
   "relations": []
