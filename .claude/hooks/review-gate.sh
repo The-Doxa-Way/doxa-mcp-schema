@@ -113,7 +113,9 @@ merge_repo_flag() {
     case "$1" in
       --repo|-R) [ $# -gt 1 ] && printf '%s' "${2%%[;&|)]*}"; return 0 ;;
       --repo=*) local v="${1#--repo=}"; printf '%s' "${v%%[;&|)]*}"; return 0 ;;
+      -R?*) local v="${1#-R}"; printf '%s' "${v%%[;&|)]*}"; return 0 ;;   # attached: -Rowner/repo
       --body|-b|--body-file|-F|--subject|-t|--match-head-commit|--author-email|-A) shift; [ $# -gt 0 ] && shift ;;
+      -[!-]*R*) printf '?'; return 0 ;;   # -R in a flag cluster: unreadable, so it blocks
       '&&'|';'|'|'|'||') return 0 ;;
       *) shift ;;
     esac
@@ -183,6 +185,24 @@ elif [ -n "$cmd" ]; then
   fi
   [ -n "$landing" ] || exit 0   # not a landing command
 
+  # The merge contract (Vercel Security Review, 2026-11-05: five rounds found a
+  # new way to make the parse pick a decoy PR or repo): a Bash merge names ONE
+  # literal PR number or PR URL, in a command with no $, backtick or backslash,
+  # so nothing expands and the quote mask is exact. Anything else blocks.
+  if [ "$landing" = merge ]; then
+    contract=""
+    case "$rg_pr_ref" in
+      https://github.com/*|github.com/*) printf '%s' "$rg_pr_ref" | grep -qE '^(https://)?github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[0-9]+$' || contract="the ref must be a PR number or PR URL" ;;
+      ''|*[!0-9]*) contract="the ref must be a PR number or PR URL" ;;
+    esac
+    [ "$(printf '%s' "$raw" | grep -oE 'gh[[:space:]]+pr[[:space:]]+merge' | wc -l | tr -d ' ')" = 1 ] || contract="one merge per command"
+    case "$cmd" in *'$'*|*'`'*|*\\*) contract="no \$, backtick or backslash in the command (put a long body in --body-file)" ;; esac
+    if [ -n "$contract" ]; then
+      echo "review-gate: merge with a literal PR number in a plain command — $contract." >&2
+      exit 2
+    fi
+  fi
+
   # Which repo? Only the merge's own command may say: -R/--repo/--repo=, a
   # GH_REPO= prefix on that gh, or a PR URL that IS its ref. `export GH_REPO`
   # and a GH_REPO set anywhere else never count (fails closed).
@@ -208,8 +228,16 @@ elif [ -n "$cmd" ]; then
     esac
   fi
   if [ -n "$judge_self" ]; then
-    :   # no merge, or several, we can pin to one command: this repo's gate applies
+    # A merge we cannot pin to one plain command, or a GH_REPO set anywhere
+    # but on it: block, never guess a repo or a checkout (Vercel Security
+    # Review, 2026-11-05).
+    echo "review-gate: cannot tell which repo and checkout this \`gh pr merge\` runs in — run it alone, with -R if it is a sibling's." >&2
+    exit 2
   elif [ -n "$flag_repo" ]; then
+    # Only a plain [github.com/]owner/repo (or the PR URL) can name a sibling;
+    # a masked or odd -R value is unknown, never a sibling.
+    printf '%s' "$flag_repo" | grep -qE '^((https://)?github\.com/)?[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(/pull/[0-9]+)?$' \
+      || { echo "review-gate: cannot read the -R/--repo of this \`gh pr merge\` exactly — give it as owner/repo." >&2; exit 2; }
     is_self "$flag_repo" || exit 0   # sibling repo — their gates, not ours
   else
     # gh resolves the repo from the directory the command runs in: the LAST

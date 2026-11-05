@@ -1,5 +1,5 @@
 {
-  "merkleRoot": "458c0c87c46cbd1f2e1d190036accb97bdeb3a3f8df581ba41800b1df0f9bf93",
+  "merkleRoot": "969a17b4272db4b4e94c59f5539bc96f67b5f5271f9c3a83d96cc5c0480d34af",
   "observations": [
     {
       "hash": "cea4759598e6a97c2fb1dc74d18ca53b7255641b0f0bbe866f1533d3e1ac8b43",
@@ -289,10 +289,27 @@
         "entityType": "Reference"
       },
       "timestamp": "2026-11-05T22:32:03.018Z"
+    },
+    {
+      "hash": "94758bc2dfd6cc5ef3eb570e196532a69b4f782b6fe216a0aed5e2aba4fd1ad5",
+      "entityName": "FleetGates",
+      "content": "2026-11-05: gate hooks re-rendered from The-Doxa-Way-CNS@848eaf8860 (#2424): a Bash gh pr merge must name one literal PR number or PR URL in a plain command, anything else blocks; gate hooks never run code from the checkout they judge.",
+      "provenance": {
+        "sourceFile": ".claude/hooks/review-gate.sh",
+        "lineNumber": null,
+        "lineRange": null,
+        "fileHash": "9a98f44938487c4c54554ed4014d5c5a7b253b808db0fbfbb0c6bb4662f5407b",
+        "totalLines": 392,
+        "extractedAt": "2026-11-05T23:13:00.821Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "Reference"
+      },
+      "timestamp": "2026-11-05T23:13:00.822Z"
     }
   ],
   "lastVerified": "2026-11-03T09:12:39.907Z",
   "version": 1,
   "createdAt": "2026-08-11T16:37:19.499Z",
-  "lastModified": "2026-11-05T22:32:03.062Z"
+  "lastModified": "2026-11-05T23:13:00.837Z"
 }

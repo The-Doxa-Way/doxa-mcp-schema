@@ -125,15 +125,19 @@ supports_remote_pr() {
 # tooling trouble (script missing, node missing, no origin/main, empty range).
 # On a CONFIRMED violation exits the WHOLE hook with 2.
 merge_integrity_local() {
-  local root mi_base mi_out mi_status
+  local root mi_base mi_out mi_status checker
   root="$(git -C "$1" rev-parse --show-toplevel 2>/dev/null)" || return 0
   [ -n "$root" ] || return 0
   command -v node >/dev/null 2>&1 || return 0
-  [ -f "$root/scripts/check-kg-merge-integrity.js" ] || return 0
+  # The checker always comes from the project install, never from the checkout
+  # being judged: a PR branch controls its own scripts (Vercel Security Review,
+  # 2026-11-05). It runs with the judged checkout as its working directory.
+  checker="${CLAUDE_PROJECT_DIR:-$root}/scripts/check-kg-merge-integrity.js"
+  [ -f "$checker" ] || return 0
   mi_base="${2:-$(git -C "$root" merge-base HEAD origin/main 2>/dev/null)}"
   [ -n "$mi_base" ] || return 0
   [ "$mi_base" != "$(git -C "$root" rev-parse HEAD 2>/dev/null)" ] || return 0
-  mi_out="$(cd "$root" && node "$root/scripts/check-kg-merge-integrity.js" "$mi_base" HEAD 2>&1)"
+  mi_out="$(cd "$root" && node "$checker" "$mi_base" HEAD 2>&1)"
   mi_status=$?
   if [ "$mi_status" -eq 1 ]; then
     printf '%s\n' "$mi_out" >&2
