@@ -77,25 +77,29 @@ pr_ref="$(printf '%s' "$payload" | jq -r '(.tool_input.pullNumber // .tool_input
 # character (a ref, a repo); anything else is QMSG, so its ; | ( or -R can
 # never act as shell syntax or a flag.
 gate_words() {
-  printf '%s' "$1" | perl -0777 -pe 's/((?<!\\)\x27[^\x27]*\x27|(?<!\\)"(?:[^"\\]|\\.)*")/ my $q = $1; my @s; if ($q =~ m{^"} && $q =~ m{\$\(|`}) { while ($q =~ m{\$(\((?:[^()]++|(?1))*\))|`([^`]*)`}g) { push @s, defined $1 ? substr($1, 1, -1) : $2 } @s ? join("", map { " ; $_ ; " } @s) : substr($q, 1, -1) } elsif ($q =~ m{^.[A-Za-z0-9_.\/:@+=,%-]*.$}) { substr($q, 1, -1) } else { "QMSG" } /ge' 2>/dev/null \
+  printf '%s' "$1" | perl -0777 -pe 's/((?<!\\)\x27[^\x27]*\x27|(?<!\\)"(?:[^"\\]|\\.)*")/ my $q = $1; my @s; if ($q =~ m{^"} && $q =~ m{\$\(|`}) { while ($q =~ m{\$(\((?:[^()]++|(?1))*\))|`([^`]*)`}g) { push @s, defined $1 ? substr($1, 1, -1) : $2 } @s ? join("", map { " ; $_ ; " } @s) : substr($q, 1, -1) } elsif ($q =~ m{^.[A-Za-z0-9_.\/:@+=,%-]+.$}) { substr($q, 1, -1) } else { "QMSG" } /ge' 2>/dev/null \
     || printf '%s' "$1" | tr -d "\"'"
 }
 # merge_repo_flag <tokens…>: the value of -R/--repo given to `gh pr merge`
 # itself (flags with values skipped), or nothing.
 merge_repo_flag() {
+  local found="" n=0 v
   while [ $# -ge 3 ] && ! { [ "${1##*[(\{\`]}" = "gh" ] && [ "$2" = "pr" ] && [ "$3" = "merge" ]; }; do shift; done
   if [ $# -ge 3 ]; then shift 3; else return 0; fi
   while [ $# -gt 0 ]; do
     case "$1" in
-      --repo|-R) [ $# -gt 1 ] && printf '%s' "${2%%[;&|)]*}"; return 0 ;;
-      --repo=*) local v="${1#--repo=}"; printf '%s' "${v%%[;&|)]*}"; return 0 ;;
-      -R?*) local v="${1#-R}"; printf '%s' "${v%%[;&|)]*}"; return 0 ;;   # attached: -Rowner/repo
+      --repo|-R) n=$((n+1)); [ $# -gt 1 ] && found="${2%%[;&|)]*}"; shift; [ $# -gt 0 ] && shift ;;
+      --repo=*) n=$((n+1)); v="${1#--repo=}"; found="${v%%[;&|)]*}"; shift ;;
       --body|-b|--body-file|-F|--subject|-t|--match-head-commit|--author-email|-A) shift; [ $# -gt 0 ] && shift ;;
-      -[!-]*R*) printf '?'; return 0 ;;   # -R in a flag cluster: unreadable, so it blocks
-      '&&'|';'|'|'|'||') return 0 ;;
+      # Attached (-Rx) or clustered (-sR) -R, or a second repo flag (the last
+      # one wins in gh): unreadable, so it blocks.
+      -R?*|-[!-]*R*) n=$((n+1)); found='?'; shift ;;
+      '&&'|';'|'|'|'||') break ;;
       *) shift ;;
     esac
   done
+  [ "$n" -le 1 ] || found='?'
+  printf '%s' "$found"
 }
 # merge_segment <raw> <words>: the one simple command that runs `gh pr merge`,
 # cut from the masked words at every ; & | newline and backtick — empty when
@@ -168,7 +172,11 @@ elif [ -n "$cmd" ]; then
       ''|*[!0-9]*) contract="the ref must be a PR number or PR URL" ;;
     esac
     [ "$(printf '%s' "$raw" | grep -oE 'gh[[:space:]]+pr[[:space:]]+merge' | wc -l | tr -d ' ')" = 1 ] || contract="one merge per command"
-    case "$cmd" in *'$'*|*'`'*|*\\*) contract="no \$, backtick or backslash in the command (put a long body in --body-file)" ;; esac
+    case "$cmd" in *'$'*|*'`'*|*\\*|*'""'*|*"''"*) contract="no \$, backtick, backslash or empty quote in the command (put a long body in --body-file)" ;; esac
+    # An unquoted # can start a shell comment (after a space, ) or ;): what
+    # follows never runs. A merge never needs one: refs are numbers or URLs.
+    printf '%s' "$scan" | grep -q '#' && contract="no shell comment on a merge command"
+    printf '%s' "$scan" | sed -E 's/(^|[[:space:]])2>&1([[:space:]]|$)/\1\2/g' | grep -q '[<>]' && contract="no redirection on a merge command (2>&1 alone is fine)"
     if [ -n "$contract" ]; then
       echo "test-gate: merge with a literal PR number in a plain command — $contract." >&2
       exit 2
