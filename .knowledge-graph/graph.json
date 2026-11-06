@@ -88,6 +88,16 @@
       "observations": [
         "2026-11-05 (Garth: lead every listing with 'Record and hold prophetic encouragement for decades.'): server.json 1.0.6 description is 'Record and hold prophetic encouragement for decades. Doxa's Bible (BSB) and encouragement tools.' (96 of 100 chars; drops the self-run faith-AI score from the listing line). README hero leads with the same line. Published to registry.modelcontextprotocol.io as io.github.The-Doxa-Way/doxa-mcp with mcp-publisher from this repo root."
       ]
+    },
+    {
+      "name": "FleetGates",
+      "entityType": "Reference",
+      "observations": [
+        "2026-11-05: re-rendered the gate hooks from The-Doxa-Way-CNS fleet/gates templates at 971d0c9245 (CNS #2417, #2391). Merge-message text is data; the repo of a merge comes only from that merge's own command; any doubt applies this repo's gates.",
+        "2026-11-05: gate hooks re-rendered from The-Doxa-Way-CNS@848eaf8860 (#2424): a Bash gh pr merge must name one literal PR number or PR URL in a plain command, anything else blocks; gate hooks never run code from the checkout they judge.",
+        "2026-11-06: gate hooks re-rendered from The-Doxa-Way-CNS@65ff05174b (#2453): stricter merge contract (literal PR ref; no redirection, shell comment or empty quote; every repo flag read) and push prefilter.",
+        "2026-11-06: gate hooks re-rendered from The-Doxa-Way-CNS@46cc70a524 (#2453, #2517): literal-PR merge contract (no redirection at all, shell comment or empty quote; every repo flag read; a masked cd target or a cd/pushd the hook cannot follow blocks) and push prefilter."
+      ]
     }
   ],
   "relations": []

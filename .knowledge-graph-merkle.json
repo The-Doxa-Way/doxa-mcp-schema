@@ -1,5 +1,5 @@
 {
-  "merkleRoot": "bcd455c1b24a92e6adc012ba9bbf40d529d9de46c028e5dd8b4699aef1ec1733",
+  "merkleRoot": "768632c15bbdf9816d667a8e6b8ab528374cedbff5bd2ac6da4ae3e8e5a674c0",
   "observations": [
     {
       "hash": "cea4759598e6a97c2fb1dc74d18ca53b7255641b0f0bbe866f1533d3e1ac8b43",
@@ -274,6 +274,40 @@
       "timestamp": "2026-11-05T16:05:25.450Z"
     },
     {
+      "hash": "9a2b1bd3461270c3c62c71b9967664a42a1eab4720b6694dc8554c0335514293",
+      "entityName": "FleetGates",
+      "content": "2026-11-05: re-rendered the gate hooks from The-Doxa-Way-CNS fleet/gates templates at 971d0c9245 (CNS #2417, #2391). Merge-message text is data; the repo of a merge comes only from that merge's own command; any doubt applies this repo's gates.",
+      "provenance": {
+        "sourceFile": ".claude/hooks/review-gate.sh",
+        "lineNumber": null,
+        "lineRange": null,
+        "fileHash": "a185d9c0d1bbacac580ab6ed6c9c5c5e6bd61e877e7675facf39e5789cff26fc",
+        "totalLines": 364,
+        "extractedAt": "2026-11-05T22:32:03.011Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "Reference"
+      },
+      "timestamp": "2026-11-05T22:32:03.018Z"
+    },
+    {
+      "hash": "94758bc2dfd6cc5ef3eb570e196532a69b4f782b6fe216a0aed5e2aba4fd1ad5",
+      "entityName": "FleetGates",
+      "content": "2026-11-05: gate hooks re-rendered from The-Doxa-Way-CNS@848eaf8860 (#2424): a Bash gh pr merge must name one literal PR number or PR URL in a plain command, anything else blocks; gate hooks never run code from the checkout they judge.",
+      "provenance": {
+        "sourceFile": ".claude/hooks/review-gate.sh",
+        "lineNumber": null,
+        "lineRange": null,
+        "fileHash": "9a98f44938487c4c54554ed4014d5c5a7b253b808db0fbfbb0c6bb4662f5407b",
+        "totalLines": 392,
+        "extractedAt": "2026-11-05T23:13:00.821Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "Reference"
+      },
+      "timestamp": "2026-11-05T23:13:00.822Z"
+    },
+    {
       "hash": "526974e35c1c996f3b670fe9ddb09c0083cf5fe6fcadeff2b0b75a3c15b7456b",
       "entityName": "DoxaMcpRegistryListing",
       "content": "2026-11-05 (Garth: lead every listing with 'Record and hold prophetic encouragement for decades.'): server.json 1.0.6 description is 'Record and hold prophetic encouragement for decades. Doxa's Bible (BSB) and encouragement tools.' (96 of 100 chars; drops the self-run faith-AI score from the listing line). README hero leads with the same line. Published to registry.modelcontextprotocol.io as io.github.The-Doxa-Way/doxa-mcp with mcp-publisher from this repo root.",
@@ -289,10 +323,43 @@
         "entityType": "Reference"
       },
       "timestamp": "2026-11-06T00:05:55.105Z"
+    },
+    {
+      "hash": "6c3a6402bcd01dbde5b5498343fc7ead9b84ba361c0a6bf80c0ebce7d178e6c0",
+      "entityName": "FleetGates",
+      "content": "2026-11-06: gate hooks re-rendered from The-Doxa-Way-CNS@65ff05174b (#2453): stricter merge contract (literal PR ref; no redirection, shell comment or empty quote; every repo flag read) and push prefilter.",
+      "provenance": {
+        "sourceFile": ".claude/hooks/review-gate.sh",
+        "lineNumber": null,
+        "lineRange": null,
+        "fileHash": "1a3acde5267982218c3af11f94dbc5082195aa0e34c56ed689ec84a4ebe0ce4d",
+        "totalLines": 400,
+        "extractedAt": "2026-11-06T00:39:30.084Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "Reference"
+      },
+      "timestamp": "2026-11-06T00:39:30.086Z"
+    },
+    {
+      "hash": "51b9f07ae1b313eb2ce4d6f9e736e6a84d894a1aeab6081e9739cbd418437e2d",
+      "entityName": "FleetGates",
+      "content": "2026-11-06: gate hooks re-rendered from The-Doxa-Way-CNS@46cc70a524 (#2453, #2517): literal-PR merge contract (no redirection at all, shell comment or empty quote; every repo flag read; a masked cd target or a cd/pushd the hook cannot follow blocks) and push prefilter.",
+      "provenance": {
+        "sourceFile": ".claude/hooks/review-gate.sh",
+        "lineNumber": null,
+        "lineRange": null,
+        "fileHash": "6926fd020e19908d121e91abf07f8f0f24b7d7cbf8be6faa8924f1f744172e08",
+        "totalLines": 404,
+        "extractedAt": "2026-11-06T01:41:19.239Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "Reference"
+      },
+      "timestamp": "2026-11-06T01:41:19.241Z"
     }
   ],
-  "lastVerified": "2026-11-03T09:12:39.907Z",
+  "lastVerified": "2026-11-06T00:39:25.410Z",
   "version": 1,
-  "createdAt": "2026-08-11T16:37:19.499Z",
-  "lastModified": "2026-11-06T00:05:55.117Z"
+  "lastModified": "2026-11-06T01:41:19.258Z"
 }
