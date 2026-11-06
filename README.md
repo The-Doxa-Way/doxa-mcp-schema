@@ -5,7 +5,8 @@
 <h1 align="center">Doxa MCP</h1>
 
 <p align="center">
-  <b>A Christian AI for any question, in any season.</b><br/>
+  <b>Record and hold prophetic encouragement for decades.</b><br/>
+  A Christian AI for any question, in any season.<br/>
   Truth that points to Jesus, and to real relationships.<br/>
   <code>https://doxa.app/mcp/v1</code>
 </p>
