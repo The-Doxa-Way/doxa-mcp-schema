@@ -176,7 +176,7 @@ elif [ -n "$cmd" ]; then
     # An unquoted # can start a shell comment (after a space, ) or ;): what
     # follows never runs. A merge never needs one: refs are numbers or URLs.
     printf '%s' "$scan" | grep -q '#' && contract="no shell comment on a merge command"
-    printf '%s' "$scan" | sed -E 's/(^|[[:space:]])2>&1([[:space:]]|$)/\1\2/g' | grep -q '[<>]' && contract="no redirection on a merge command (2>&1 alone is fine)"
+    printf '%s' "$scan" | grep -q '[<>]' && contract="no redirection on a merge command (not even 2>&1: its & splits the command)"
     if [ -n "$contract" ]; then
       echo "test-gate: merge with a literal PR number in a plain command — $contract." >&2
       exit 2
@@ -228,6 +228,7 @@ elif [ -n "$cmd" ]; then
         /*) : ;;
         *) [ -n "$hook_cwd" ] && [ -d "$hook_cwd" ] && cmd_cd="$hook_cwd/$cmd_cd" ;;
       esac
+      case "$cmd_cd" in *QMSG*) cd_doubt=1 ;; esac   # a masked path names no real directory
       if [ -n "$cmd_cd" ] && [ -d "$cmd_cd" ]; then dir="$cmd_cd"; else cd_doubt=1; fi
       remaining="${BASH_REMATCH[3]}"
     done
@@ -235,6 +236,9 @@ elif [ -n "$cmd" ]; then
     # cwd (maybe a sibling) nor the project checkout (maybe another clone) is
     # known to be where this runs (Vercel Security Review, 2026-11-05).
     printf '%s' "$scan" | grep -qE 'git[[:space:]]+-C[[:space:]]+QMSG' && cd_doubt=1
+    # Only the leading cd hops are read: any later cd, pushd or popd moves the
+    # shell where this hook cannot follow.
+    printf '%s' "$remaining" | grep -qE '(^|[^A-Za-z0-9_./-])(cd|pushd|popd)([^A-Za-z0-9_./-]|$)' && cd_doubt=1
     if [ -n "$cd_doubt" ]; then
       echo "test-gate: cannot read the directory this command runs in exactly — use a plain, existing path." >&2
       exit 2
