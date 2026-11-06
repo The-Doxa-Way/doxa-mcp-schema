@@ -83,6 +83,13 @@
       ]
     },
     {
+      "name": "DoxaMcpRegistryListing",
+      "entityType": "Reference",
+      "observations": [
+        "2026-11-05 (Garth: lead every listing with 'Record and hold prophetic encouragement for decades.'): server.json 1.0.6 description is 'Record and hold prophetic encouragement for decades. Doxa's Bible (BSB) and encouragement tools.' (96 of 100 chars; drops the self-run faith-AI score from the listing line). README hero leads with the same line. Published to registry.modelcontextprotocol.io as io.github.The-Doxa-Way/doxa-mcp with mcp-publisher from this repo root."
+      ]
+    },
+    {
       "name": "FleetGates",
       "entityType": "Reference",
       "observations": [
