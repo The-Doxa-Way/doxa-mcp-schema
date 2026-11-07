@@ -51,6 +51,13 @@
       "observations": [
         "2026-11-06 (The-Doxa-Way-CNS spec the-doxa-way-control-tower F6): this repo's KG becomes CNS source doxa-mcp-schema (authority/registry.yaml). Fleet-wide facts are held by the CNS meta-KG or by the other CNS sources (doxa-app, openclaw, doxa-shared), so this repo's copies were removed (federated, they opened conflicts; the Decision ones queue for Garth): KgMergeIntegrityGuard, FleetSecurityBaseline20261103, CanonicalFleetGates, KgMerkleFixesPropagated, KgGuardRequiredCheckNaming, ReviewGatePrHeadResolution, FleetGates. Repo-local facts that shared a name with another F6 repo were renamed: BrandPresenceAudit0928 -> DoxaMcpBrandPresenceAudit0928, LandingGatesInfra -> DoxaMcpSchemaLandingGatesInfra. Rule: kg-save only facts about THIS repo here, under a repo-scoped name. A gate or fleet fact is a kg-save in The-Doxa-Way-CNS; a gate re-render PR here carries no KG change (title it chore(sync): ..., which KG Guard exempts)."
       ]
+    },
+    {
+      "name": "TypeScript7ServerBuild",
+      "entityType": "CodeGotcha",
+      "observations": [
+        "2026-11-07 pr-banker banked dependabot #20 (typescript 5.9.3 -> 7.0.2 in server/). TS 6+ defaults compilerOptions.types to [], so tsc 7 failed TS2591 'Cannot find name process' until server/tsconfig.json listed types:[node]. Compiled dist is byte-identical to the TS 5.9 build. TS 7 ships its compiler as optional @typescript/typescript-<os>-<arch> packages: never build with npm ci --omit=optional. No CI builds server/ yet, so a major-bump break is only caught by a hand build."
+      ]
     }
   ],
   "relations": []
