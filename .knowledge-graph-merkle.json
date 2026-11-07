@@ -1,5 +1,5 @@
 {
-  "merkleRoot": "e147410d51f7191c183a0ddf912e4d328fdb8ab34b5153a9ae5a5f3edadff52f",
+  "merkleRoot": "eb06687bc38f9d66aace7539c9a09da687c1fa84be3819d7b22c2e3984fe622c",
   "observations": [
     {
       "hash": "8c4477b4f683bf830b6fd91bf6958d79596304ddb08a8852ef827504a812d42e",
@@ -168,9 +168,26 @@
         "entityType": "Decision"
       },
       "timestamp": "2026-11-06T04:51:09.022Z"
+    },
+    {
+      "hash": "767c19911cfc82f4744196304eb172cf75c803406770601fcea341596191f13e",
+      "entityName": "TypeScript7ServerBuild",
+      "content": "2026-11-07 pr-banker banked dependabot #20 (typescript 5.9.3 -> 7.0.2 in server/). TS 6+ defaults compilerOptions.types to [], so tsc 7 failed TS2591 'Cannot find name process' until server/tsconfig.json listed types:[node]. Compiled dist is byte-identical to the TS 5.9 build. TS 7 ships its compiler as optional @typescript/typescript-<os>-<arch> packages: never build with npm ci --omit=optional. No CI builds server/ yet, so a major-bump break is only caught by a hand build.",
+      "provenance": {
+        "sourceFile": "server/tsconfig.json",
+        "lineNumber": 7,
+        "lineRange": null,
+        "fileHash": "b9939084efef58bdcf9469e61d5d4137499d2704ea016626916fd3a4698e3272",
+        "totalLines": 26,
+        "extractedAt": "2026-11-07T07:26:08.601Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "CodeGotcha"
+      },
+      "timestamp": "2026-11-07T07:26:08.602Z"
     }
   ],
-  "lastVerified": "2026-11-06T04:51:18.099Z",
+  "lastVerified": "2026-11-07T07:26:12.554Z",
   "version": 1,
-  "lastModified": "2026-11-06T04:51:18.101Z"
+  "lastModified": "2026-11-07T07:26:12.554Z"
 }
