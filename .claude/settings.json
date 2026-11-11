@@ -16,6 +16,11 @@
           },
           {
             "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/push-review-gate.sh",
+            "statusMessage": "push gate (max review before git push)"
+          },
+          {
+            "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/test-gate.sh",
             "statusMessage": "test gate (code changes need tests)"
           }
