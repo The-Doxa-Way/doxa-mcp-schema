@@ -58,6 +58,13 @@
       "observations": [
         "2026-11-07 pr-banker banked dependabot #20 (typescript 5.9.3 -> 7.0.2 in server/). TS 6+ defaults compilerOptions.types to [], so tsc 7 failed TS2591 'Cannot find name process' until server/tsconfig.json listed types:[node]. Compiled dist is byte-identical to the TS 5.9 build. TS 7 ships its compiler as optional @typescript/typescript-<os>-<arch> packages: never build with npm ci --omit=optional. No CI builds server/ yet, so a major-bump break is only caught by a hand build."
       ]
+    },
+    {
+      "name": "MaxReviewBeforePushGate",
+      "entityType": "Reference",
+      "observations": [
+        "Garth 2026-11-11 order: one /code-review max pass before every push of code. This repo now runs the fleet-template PreToolUse hook .claude/hooks/push-review-gate.sh (rendered from doxa-cns fleet/gates; doxa-cns KG MaxReviewBeforePushDoctrine, PR #2905): a git push of new code commits (not on main) needs ATTEST_REVIEW_LEVEL=max scripts/attest-review.sh <verdict>, or a logged 'waived:' row (docs-only: 'waived: docs-only: <reason>'), or PUSH_GATE_WAIVE=<reason> for a human-review-only push (no attestation, no merge authority). Exempt: deletes, tags, notes, a tip already on main, KG-only commits. Baseline 7 days to 2026-11-11: 50 runs, 1 failure, 0 reruns."
+      ]
     }
   ],
   "relations": []
