@@ -23,6 +23,14 @@
 # Optional env ATTEST_REVIEWER_MODEL (e.g. claude-opus-5-5, the pinned review
 # tier) adds a "reviewer_model" field to the jsonl row; unset, the row is as before.
 #
+# Optional env ATTEST_REVIEW_LEVEL (low|medium|high|xhigh|max — the /code-review
+# effort level that ran) adds a "review_level" field to the jsonl row and to the
+# portable note. Garth 2026-11-11: every push needs ONE `/code-review max` pass,
+# and .claude/hooks/push-review-gate.sh accepts only review_level "max" (or an
+# explicit `waived:`). Unset, the row is as before; any other value is refused.
+#
+#   ATTEST_REVIEW_LEVEL=max scripts/attest-review.sh "clean"
+#
 # The ledger lives in the repo's .git dir (survives within a clone, never
 # committed, never churns the tree). This is PROCESS enforcement — it makes
 # forgetting the review pass impossible, it does not make the attestation
@@ -67,6 +75,11 @@ case "$verdict" in
   -*) echo "attest-review.sh: refusing to record \"$verdict\" as a verdict — it looks like a flag, not a review outcome." >&2; exit 2 ;;
 esac
 findings="${2:-}"
+review_level="$(printf '%s' "${ATTEST_REVIEW_LEVEL:-}" | tr '[:upper:]' '[:lower:]')"
+case "$review_level" in
+  ''|low|medium|high|xhigh|max) ;;
+  *) echo "attest-review.sh: refusing ATTEST_REVIEW_LEVEL=\"${ATTEST_REVIEW_LEVEL}\" — use one of low|medium|high|xhigh|max (the /code-review effort level that ran)." >&2; exit 2 ;;
+esac
 common="$(git rev-parse --path-format=absolute --git-common-dir)"
 [ -n "$common" ] || { echo "error: not inside a git repository — cannot record attestation" >&2; exit 1; }
 sha="$(git rev-parse HEAD)"
@@ -132,8 +145,11 @@ fi
 if [ -n "${ATTEST_REVIEWER_MODEL:-}" ]; then
   row="$(printf '%s' "$row" | jq -c --arg m "$ATTEST_REVIEWER_MODEL" '. + {reviewer_model:$m}')"
 fi
+if [ -n "$review_level" ]; then
+  row="$(printf '%s' "$row" | jq -c --arg l "$review_level" '. + {review_level:$l}')"
+fi
 printf '%s\n' "$row" >> "$common/review-attest.jsonl"
-echo "attested: $branch@${sha:0:8} — $verdict"
+echo "attested: $branch@${sha:0:8} — $verdict${review_level:+ (review level: $review_level)}"
 
 if command -v node >/dev/null 2>&1 && [ -f "$script_dir/review-attest-note.mjs" ]; then
   at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -146,6 +162,7 @@ if command -v node >/dev/null 2>&1 && [ -f "$script_dir/review-attest-note.mjs" 
   note_args=(--head "$sha" --branch "$branch" --verdict "$verdict"
              --reviewer "${reviewer:-unknown}" --at "$at" --base-name "$base_ref")
   if [ -n "$findings" ]; then note_args+=(--findings-summary "$findings"); fi
+  if [ -n "$review_level" ]; then note_args+=(--review-level "$review_level"); fi
   note_result="$(node "$script_dir/review-attest-note.mjs" "${note_args[@]}" 2>/dev/null)" || note_result=""
   if [ -n "$note_result" ] && printf '%s' "$note_result" | jq -e '.written and .pushed' >/dev/null 2>&1; then
     echo "portable: content key recorded + pushed (refs/notes/review-attest)"
