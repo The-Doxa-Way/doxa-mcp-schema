@@ -31,10 +31,7 @@
 #   - an explicit `waived:` verdict (the logged waiver; any level).
 # A commit a review BLOCKED (review-blocked.jsonl, by SHA or tree) never
 # qualifies. So a kg-save commit, or a merge of the base, after the attested
-# commit still passes; a code commit after it does not. When that walk finds
-# an uncovered commit, the portable content key (scripts/review-attest-check.mjs
-# --require-level max, where the repo has it) is the last avenue: it passes a
-# rebase of already-reviewed content.
+# commit still passes; a code commit after it does not.
 #
 # NOT GATED (exit 0): ref deletes (-d/--delete, `:ref`), tags (--tags, refs/tags/,
 # a tag name), notes (refs/notes/ — attest-review.sh pushes its own note), a
@@ -62,8 +59,7 @@
 # blocks: code commits with no qualifying attestation. Every block, every
 # allow by exemption or waiver, and every push it could not judge
 # ("unjudged") are logged to $GIT_COMMON_DIR/push-review-gate.jsonl, so the
-# fail-open residue is measured, not invisible. The content-key checker is
-# always this install's own copy, never the judged checkout's.
+# fail-open residue is measured, not invisible.
 #
 # Shell pushers that run without Claude (cns-push.js, social-*-record.mjs,
 # git-commit-generated.js, heal-kg-conflict.mjs) are out of a Claude hook's
@@ -223,18 +219,6 @@ check_sha() {
   if [ "${#attested[@]}" -gt 0 ]; then
     uncovered="$(uncovered_commits "$d" "$sha" "${nots[@]}" "${attested[@]}")"
     [ -z "$uncovered" ] && return 0
-  fi
-
-  # Portable content key: a rebase or re-commit of content already reviewed at
-  # max. Never for a tip a review BLOCKED; always THIS install's checker, never
-  # the judged checkout's own copy.
-  local checker="$here/scripts/review-attest-check.mjs"
-  if ! is_blocked "$d" "$common" "$sha" && command -v node >/dev/null 2>&1 && [ -f "$checker" ] \
-     && [ -n "$integration_branch" ] && git -C "$d" rev-parse -q --verify "refs/remotes/$remote/$integration_branch" >/dev/null 2>&1; then
-    result="$(node "$checker" --cwd "$d" --base "$remote/$integration_branch" --head "$sha" --require-level max 2>/dev/null)" || result=""
-    if [ -n "$result" ] && printf '%s' "$result" | jq -e '.reused == true and ((.reviewLevel // "") | ascii_downcase) == "max"' >/dev/null 2>&1; then
-      return 0
-    fi
   fi
 
   log_decision "$common" block "$sha" "$ref" "$(printf '%s\n' "$uncovered" | grep -c .) uncovered commit(s)"
