@@ -72,6 +72,13 @@
       "observations": [
         "2026-11-14 (CEO order: the 13-14 Nov work applies to ALL repos): first CLAUDE.md for this repo. CEO ownership line; what the repo holds (schemas, server.json, npm client, local stdio server; hosted server and prompt stay private in doxa-app); real verify commands per package (no root package.json; client npm test is a LIVE smoke test, red on 2026-11-14 because the hosted _quota dropped window_seconds; server has no tests; jq JSON check; gate scripts node --test); gotchas (sync-tools generates tools.ts, publishing by hand, registry namespace + ?src=registry, server version in two places); landing doctrine (kg-save, max review, attest exact head SHA, push, merge). Points to The-Doxa-Way-CNS. AGENTS.md generated from it by doxa-cns generate-agents-md.mjs."
       ]
+    },
+    {
+      "name": "MonitorToolHookMatcherDoctrine",
+      "entityType": "Reference",
+      "observations": [
+        "2026-11-14 doxa-mcp-schema: the 4 PreToolUse gate hooks (kg-save, review, push-review, test) in .claude/settings.json moved from matcher Bash to Bash|Monitor; Claude Code 2.1.310 fires Bash hooks only for Bash, so git push / gh pr merge through Monitor skipped them. scripts/hook-matchers-monitor.test.js (same file as doxa-brand #129) fails on a Bash-only entry."
+      ]
     }
   ],
   "relations": []
