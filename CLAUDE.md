@@ -5,61 +5,66 @@ This codebase is yours: what it's for and how it's built are your call, and you'
 ## What this is
 
 The public side of Doxa MCP, a product of the Doxa business (doxa.app). The hosted server
-(`https://doxa.app/mcp/v1`) lives in doxa-app. This repo holds the public tool schemas
-(`schemas/`), the registry descriptor (`server.json`), the npm client `@thedoxaway/mcp-client`
-(`clients/typescript/`), a local stdio server `@thedoxaway/mcp-server` (`server/`) that forwards
-to the hosted endpoint, and the install docs.
+(`https://doxa.app/mcp/v1`) lives in doxa-app. This repo holds:
+- the public tool schemas (`schemas/`) and the registry descriptor (`server.json`);
+- the npm client `@thedoxaway/mcp-client` (`clients/typescript/`);
+- a local stdio server `@thedoxaway/mcp-server` (`server/`) that forwards to the hosted endpoint;
+- the install docs. External contributors follow `CONTRIBUTING.md`.
 
 The repo is PUBLIC. The hosted server code and the encourager prompt are private and stay in
-doxa-app. Never copy them here, and never commit a secret.
-
-The brand and voice rules live in doxa-brand (The-Doxa-Way/doxa-brand). Apply them; do not copy
-them here.
+doxa-app. Never copy them here, and never commit a secret. The brand and voice rules live in
+doxa-brand (The-Doxa-Way/doxa-brand, private). Apply them; do not copy them here.
 
 ## How to verify
 
-There is no root `package.json`. Each package has its own `npm ci`.
-
-- `clients/typescript`: `npm run build` (`tsc`) and `npm test`. The test is a live smoke test
-  against `doxa.app/mcp/v1` on the free anon tier. A failure there can come from a change in the
-  hosted server (doxa-app), not from this repo.
-- `server`: `npm run build` (`tsc`). It has no tests. `npm run sync-tools` rewrites
-  `server/src/tools.ts` from the live `tools/list`.
+There is no root `package.json`. Each package has its own `npm ci` (not `--omit=optional`:
+TypeScript 7 ships `tsc` in optional platform packages).
+- `clients/typescript`: `npm run build` and `npm test`. The test is a live smoke test against
+  `doxa.app/mcp/v1` (anon tier, Node 22.6+). A failure can mean the hosted server changed its
+  contract. Then update the client, its test and `schemas/` here to match.
+- `server`: `npm run build`. It has no tests.
+- JSON: `jq empty schemas/*.json examples/*.json server.json`.
 - Gate scripts: `node --test scripts/*.test.js scripts/*.test.mjs`.
-- There is no lint script. CI does NOT run builds or tests. Run them yourself before you push.
+- There is no lint script. CI runs no build or test. Run them yourself before you push.
 
 ## Gotchas
 
-- Publishing is by hand, never by merge. Registry listing: bump `version` in `server.json`, then
+- `npm run sync-tools` (in `server/`) rewrites `server/src/tools.ts` from the live `tools/list`.
+  Do not hand-edit `tools.ts`. The test gate counts it as code.
+- Publishing is by hand, never by merge. Registry: bump `version` in `server.json`, run
   `mcp-publisher publish`, then deprecate the old version (`PUBLISHING.md`). npm: `npm publish`
   in the package folder. A version bump in git does not publish.
-- The registry namespace is `io.github.The-Doxa-Way/doxa-mcp` (the org). The legacy
-  `io.github.TheDoxaWay/doxa-mcp` belongs to the separate GitHub user `TheDoxaWay`.
-- `npm pack` leaves `clients/typescript/*.tgz`. It is gitignored; never commit it.
+- The registry namespace is `io.github.The-Doxa-Way/doxa-mcp`. Only a PUBLIC org member can
+  publish it. Keep `?src=registry` on the remote URL in `server.json` (`PUBLISHING.md`).
+- The server version is in `server/package.json` and in `server/src/index.ts`. Change both.
 
-## Landing
+## Landing doctrine
 
 The production branch is `main`. Every change lands by branch, PR, independent review, merge.
 Self-review never counts.
 
-- Review: one `/code-review max` pass on the final diff on claude-opus-5-5, at most one fix
-  round, then `ATTEST_REVIEW_LEVEL=max scripts/attest-review.sh "<verdict>"` before you push.
-  `.github/workflows/claude-code-review.yml` runs only on manual dispatch.
-- Hooks in `.claude/hooks/` enforce this: `push-review-gate.sh` (max review before `git push`),
-  `review-gate.sh` (attestation before merge), `test-gate.sh` (a code change needs a test change,
-  or `scripts/attest-review.sh "waived-tests: <reason>"`) and `kg-save-gate.sh`.
-- kg-save: KG Guard CI fails a PR with no `.knowledge-graph/` change. Record it with
-  `node scripts/knowledge-graph-merkle.js add "<Entity>" "<what and why>" <source-file> --type <Type>`
-  and commit it in the same PR. Use `[skip-kg]` in the PR title only for a knowledge-free change.
-- The org ruleset requires `gitleaks` (secret-scan). `kg-save-gate.sh` refuses `gh pr merge`
-  while KG Guard is red or pending. Never merge over a red or pending check.
-- An attestation is merge authority: the fleet auto-lander (openclaw `land-prs.mjs`) merges an
-  attested, green PR.
-- The gate hooks and `scripts/attest-review.sh` are rendered from The-Doxa-Way-CNS
-  `fleet/gates/`. Fix the template there, never the copy here.
+- Order: commit the change and its kg-save. Then run one `/code-review max` pass on the final
+  diff on claude-opus-5-5, with at most one fix round. Then attest and push.
+- Attest with `ATTEST_REVIEW_LEVEL=max ATTEST_REVIEWER_MODEL=claude-opus-5-5 scripts/attest-review.sh "<verdict>"`.
+  An attestation is for one SHA. Attest again after any later commit.
+- kg-save: `node scripts/knowledge-graph-merkle.js add "<Entity>" "<what and why>" <source-file> --type <Type>`.
+  Commit `.knowledge-graph/` and `.knowledge-graph-merkle.json`. Save only facts about this repo,
+  under a repo-scoped name. Fleet and gate facts go to the CNS KG.
+- `[skip-kg]` is only for a knowledge-free change, in the PR title and in the push command.
+- `.claude/hooks/` run in a Claude Code session opened in this repo. `push-review-gate.sh`
+  blocks a push with no max attestation. `kg-save-gate.sh` blocks a push, PR or merge with no KG
+  change, and a merge while KG Guard is red or pending. `review-gate.sh` blocks a merge with no
+  attestation. `test-gate.sh` blocks a code change with no test change (waiver:
+  `scripts/attest-review.sh "waived-tests: <reason>"`). From another root, run the checks yourself.
+- GitHub requires a PR and `gitleaks` only. `claude-code-review.yml` runs only on manual dispatch.
+- An attestation is merge authority: the fleet auto-lander (doxa-openclaw `scripts/land-prs.mjs`)
+  merges an attested, green PR.
+- The gate hooks, `scripts/attest-review.sh` and `.github/workflows/kg-guard.yml` are rendered
+  from The-Doxa-Way/The-Doxa-Way-CNS `fleet/gates/`. Fix the template there, never the copy here.
 
 ## Standing orders
 
-Cross-repo rules, the standing orders and the fleet map live in The-Doxa-Way-CNS: its
-`CLAUDE.md` and `docs/org-map.md`. The CNS CLAUDE.md is the authority. If this file and the CNS
-disagree, the CNS wins.
+Fleet-wide standing orders, cross-repo rules and the fleet map live in
+The-Doxa-Way/The-Doxa-Way-CNS (private; local `~/Developer/Projects/doxa-cns`): its `CLAUDE.md`
+and `docs/org-map.md`. The CNS CLAUDE.md is the authority on cross-repo rules. If this file and
+the CNS disagree, the CNS wins.
