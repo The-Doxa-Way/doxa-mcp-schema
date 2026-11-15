@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# test-gate.sh — PreToolUse hook for the GitHub MCP merge tool (and Bash
-# `gh pr merge` where settings.json wires it on the Bash matcher).
+# test-gate.sh — PreToolUse hook for the GitHub MCP merge tool (and Bash or
+# Monitor `gh pr merge` where settings.json wires it on the Bash|Monitor matcher).
 #
 # Garth's standing rule (2026-07-16): "tests for all the code we write."
 # A doxa-mcp-schema PR merge is blocked when the chunk (merge-base(origin/main,

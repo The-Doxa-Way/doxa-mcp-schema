@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# kg-save-gate.sh — PreToolUse(Bash) hook for doxa-mcp-schema.
+# kg-save-gate.sh — PreToolUse(Bash|Monitor + GitHub MCP merge) hook for doxa-mcp-schema.
 # GENERATED from doxa-cns fleet/gates/.claude/hooks/kg-save-gate.sh (spec
 # the-doxa-way-control-tower S4). Edit the template, never this copy.
 #

@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 #
-# push-review-gate.sh — PreToolUse hook (Bash matcher): no `git push` of code
-# that has no MAX-level review attestation.
+# push-review-gate.sh — PreToolUse hook (Bash|Monitor matcher): no `git push` of code
+# that has no review attestation at the diff's risk tier (REVIEW TIER below).
 #
 # Garth's standing order (2026-11-11): "anything we build in loops or otherwise
 # gets a max code review before we push — I want to reduce failed runs and
-# reruns." review-gate.sh only checks at MERGE, after CI has already run (and
+# reruns." Tiered 2026-11-14 ("we need to dial this in"): prose docs, tests and
+# listed data folders need a lower level; every other path stays max (REVIEW
+# TIER below; evals/factory/README.md Experiment 1 has the numbers).
+# review-gate.sh only checks at MERGE, after CI has already run (and
 # failed) on unreviewed code. This gate moves the check to the PUSH: the
 # commits a push would publish must be covered by an attestation from
-# scripts/attest-review.sh run with ATTEST_REVIEW_LEVEL=max after ONE
-# `/code-review max` pass + at most one fix round on the final diff. Max is the
-# effort level of that one pass, never more rounds (CLAUDE.md § Model economy).
+# scripts/attest-review.sh run with ATTEST_REVIEW_LEVEL=<tier> after ONE
+# `/code-review <tier>` pass + at most one fix round on the final diff. The
+# level is the effort of that one pass, never more rounds (CLAUDE.md § Model
+# economy).
 #
 # WHAT IS CHECKED. The commits the push would publish are the commits of the
 # pushed tip that are not yet on the DESTINATION branch, nor on the remote's
@@ -27,8 +31,10 @@
 # subject). Each other commit must be an ancestor of (or be) a
 # new commit that holds a qualifying attestation in
 # $GIT_COMMON_DIR/review-attest.jsonl:
-#   - review_level "max" and a review verdict (not `waived-tests:`), or
-#   - an explicit `waived:` verdict (the logged waiver; any level).
+#   - a review_level at the tier or higher and a review verdict (not
+#     `waived-tests:`), or
+#   - an explicit `waived:` verdict (the logged waiver) while the tier is
+#     medium or low; a max-tier diff cannot be waived here.
 # A commit a review BLOCKED (review-blocked.jsonl, by SHA or tree) never
 # qualifies. So a kg-save commit, or a merge of the base, after the attested
 # commit still passes; a code commit after it does not.
@@ -36,7 +42,7 @@
 # NOT GATED (exit 0): ref deletes (-d/--delete, `:ref`), tags (--tags, refs/tags/,
 # a tag name), notes (refs/notes/ — attest-review.sh pushes its own note), a
 # tip that is already on the remote, a push with only exempt commits.
-# Docs-only or other no-code pushes need an explicit logged waiver:
+# Docs-only or data-only pushes (tier low or medium) may use an explicit logged waiver:
 #   scripts/attest-review.sh "waived: docs-only: <reason>"
 # A push for HUMAN review that must NOT carry merge authority (an attestation
 # is what land-prs.mjs merges on — KG AttestationIsMergeAuthority) uses the
@@ -72,13 +78,6 @@
 #
 # Exit codes: 0 = allow, 2 = block (stderr shown to the model).
 
-payload="$(cat 2>/dev/null)" || exit 0
-[ -n "$payload" ] || exit 0
-command -v jq >/dev/null 2>&1 || exit 0
-cmd="$(printf '%s' "$payload" | jq -r '.tool_input.command // empty' 2>/dev/null)"
-[ -n "$cmd" ] || exit 0
-case "$cmd" in *push*) ;; *) exit 0 ;; esac
-
 integration_branch='main'
 prod_branch='main'
 gen_re=''
@@ -86,16 +85,64 @@ authored_re=''
 exempt_re=''
 kg_re='^(\.knowledge-graph-merkle\.json|\.knowledge-graph/)'
 # Files that run or govern: never exempt by a commit subject alone.
-code_re='(\.(c|m)?js|\.ts|\.tsx|\.sh|\.py|\.ya?ml)$|^\.claude/|^\.github/|^bin/|^scripts/|(^|/)CLAUDE\.md$|(^|/)package(-lock)?\.json$'
+code_re='(\.(c|m)?js|\.ts|\.tsx|\.sh|\.py|\.ya?ml)$|^\.claude/|^\.github/|^bin/|^scripts/|^fleet/|^config/|\.tmpl$|\.sql$|(^|/)(CLAUDE|AGENTS|SKILL)\.md$|(^|/)package(-lock)?\.json$'
 
-here="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." 2>/dev/null && pwd)" || exit 0
-self_common="$(git -C "$here" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || exit 0
-self_origin="$(git -C "$here" remote get-url origin 2>/dev/null | sed -E 's#\.git$##; s#/+$##')"
-attest_cmd="$here/scripts/attest-review.sh"
-# Diff/log output must not depend on the reader's git config.
-GITQ=(-c core.quotePath=false -c diff.relative=false -c log.showRoot=true -c diff.renames=false)
-hook_cwd="$(printf '%s' "$payload" | jq -r '.cwd // empty' 2>/dev/null)"
-start_dir="${hook_cwd:-${CLAUDE_PROJECT_DIR:-$PWD}}"
+# REVIEW TIER (Garth 2026-11-14, "dial in" the max review; evals/factory
+# Experiment 1). The level the ONE pre-push `/code-review` must run at comes
+# from the changed paths alone (zero LLM), not from the author. It is an
+# ALLOWLIST: only the tested low-risk shapes get a lower level, and every
+# other path is max (the gate fails CLOSED, never open to a lower level):
+#   low     prose docs: .md/.mdx under docs/, specs/, handoffs/, proposals/,
+#           evals/ or goals/, and README.md / CHANGELOG.md anywhere.
+#   medium  tests (*.test.*, *.spec.*, __tests__/, test/, tests/, test_*.py),
+#           and data files (.json, .jsonl, .csv, .tsv, .yaml, .yml) under
+#           goals/_reports/, evals/, handoffs/, proposals/, scripts/data/,
+#           fixtures/ or results/.
+#   max     everything else: gates, hooks, workflows, config, instruction and
+#           canon files, product and app code, scripts, SQL, manifests. A path
+#           in tier_max_re, or a non-doc path that names money, auth,
+#           credentials, RLS/policy, security, safety or the encourager, is max
+#           even inside a low or medium folder.
+# The diff's tier is its highest file. KG state and generated paths do not
+# count (they are exempt above). No path, or a C-quoted path (git quotes a
+# name with ", \ or a control byte), is max. "high" is a valid review level
+# (it meets a low or medium tier) but no path tiers high: Experiment 1 tested
+# only medium against max. scripts/push-review-gate.test.mjs pins this.
+tier_max_re='^\.github/|^\.claude/|^agent-home/|^fleet/|^config/|^agents/|^learnings/|^ontology/|^authority/|^vault/00-MOCs/|(^|/)(CLAUDE|AGENTS|SKILL)\.md$|(^|/)skills/|(^|/)PROMPT[^/]*\.md$|-tick-prompt\.md$|^goals/[^/]+/GOAL\.md$|^goals/convert/experiments/|^docs/cns-reference\.md$|^docs/landing/|^evals/[^/]+/(rubric|judge|grader)|\.sql$'
+tier_kw_re='paywall|entitle|stripe|revenuecat|pricing|billing|subscri|checkout|purchase|payment|invoice|auth|login|passw|secret|credential|keychain|token|jwt|rls|polic|permission|secur|crypt|signing|signature|encourag|safety|moderat|crisis|age-?gate|consent|privacy|gdpr|outbound|send-mode'
+tier_doc_re='^(docs|specs|handoffs|proposals|evals|goals)/.*\.mdx?$|(^|/)(README|CHANGELOG)\.md$'
+tier_medium_re='\.(test|spec)\.[cm]?[jt]sx?$|(^|/)(__tests__|tests?)/|(^|/)test_[^/]+\.py$|^(goals/_reports|evals|handoffs|proposals|scripts/data)/.*\.(json|jsonl|csv|tsv|ya?ml)$|(^|/)(fixtures|results)/.*\.(json|jsonl|csv|tsv|ya?ml)$'
+
+# level_rank <level>: low 1 … max 5; anything else 0.
+level_rank() {
+  case "$1" in low) echo 1 ;; medium) echo 2 ;; high) echo 3 ;; xhigh) echo 4 ;; max) echo 5 ;; *) echo 0 ;; esac
+}
+
+# review_tier: reads changed paths on stdin; prints low|medium|high|max.
+# KG state and generated paths (not authored ones) are skipped; only such
+# paths = low (nothing to review). No path at all = max.
+review_tier() {
+  MAX_RE="$tier_max_re" KW_RE="$tier_kw_re" DOC_RE="$tier_doc_re" MED_RE="$tier_medium_re" \
+  GEN_RE="$gen_re" AUTH_RE="$authored_re" KG_RE="$kg_re" awk '
+    function rank(t) { return t == "max" ? 5 : t == "high" ? 3 : t == "medium" ? 2 : t == "low" ? 1 : 0 }
+    /^$/ { next }
+    /^"/ { n++; best = "max"; next }
+    {
+      p = $0; sub(/^\.\//, "", p)
+      authored = (ENVIRON["AUTH_RE"] != "" && p ~ ENVIRON["AUTH_RE"])
+      if (!authored && p ~ ENVIRON["KG_RE"]) { k++; next }
+      if (!authored && ENVIRON["GEN_RE"] != "" && p ~ ENVIRON["GEN_RE"]) { k++; next }
+      n++
+      doc = (p ~ ENVIRON["DOC_RE"])
+      if (p ~ ENVIRON["MAX_RE"] || (!doc && tolower(p) ~ ENVIRON["KW_RE"])) t = "max"
+      else if (doc) t = "low"
+      else if (p ~ ENVIRON["MED_RE"]) t = "medium"
+      else t = "max"
+      if (rank(t) > rank(best)) best = t
+    }
+    END { print (n > 0 && best != "") ? best : (n == 0 && k > 0) ? "low" : "max" }'
+}
+
 
 # gate_words <cmd>: every quoted string that holds whitespace becomes ONE token
 # QMSG; plain quoted tokens lose their quotes; a "$(…)" keeps its inner command
@@ -148,16 +195,37 @@ exempt_filter() {
     END { flush() }'
 }
 
-# qualifying_shas <common>: SHAs with a max-level review or an explicit waiver.
+# qualifying_shas <common> <need-rank>: SHAs with a review at the tier's level
+# or higher, or an explicit `waived:` row — the waiver only while the tier is
+# medium or lower (rank <= 2): a max-tier diff needs a real review.
 qualifying_shas() {
   local ledger="$1/review-attest.jsonl"
   [ -f "$ledger" ] || return 0
-  jq -R -r 'fromjson? | select(type == "object" and (.sha | type) == "string" and (.verdict | type) == "string")
+  jq -R -r --argjson need "${2:-5}" 'fromjson? | select(type == "object" and (.sha | type) == "string" and (.verdict | type) == "string")
     | (.verdict | ascii_downcase) as $v
+    | ({"low":1,"medium":2,"high":3,"xhigh":4,"max":5}[(.review_level // "") | tostring | ascii_downcase] // 0) as $r
     | select(($v | startswith("waived-tests:")) | not)
     | select(($v | startswith("blocked:")) | not)
-    | select(((.review_level // "") | tostring | ascii_downcase) == "max" or ($v | startswith("waived:")))
+    | ($v | startswith("waived:")) as $w
+    | select(($w and $need <= 2) or (($w | not) and $r >= $need))
     | .sha' "$ledger" 2>/dev/null
+}
+
+# commit_files <dir> <sha…>: the files each commit changed (a merge: what its
+# conflict resolution changed), one per line.
+commit_files() {
+  local d="$1" c; shift
+  for c in "$@"; do
+    if [ -n "$(git -C "$d" rev-list --no-walk --min-parents=3 "$c" 2>/dev/null)" ]; then
+      # An octopus merge has no remerge-diff (git prints a warning line in its
+      # place): judge everything it brings in over its first parent.
+      git -C "$d" "${GITQ[@]}" diff --no-renames --name-only "$c^1" "$c" 2>/dev/null
+    elif [ -n "$(git -C "$d" rev-list --no-walk --merges "$c" 2>/dev/null)" ]; then
+      git -C "$d" "${GITQ[@]}" show --remerge-diff --no-renames --format= --name-only "$c" 2>/dev/null
+    else
+      git -C "$d" "${GITQ[@]}" show --no-renames --format= --name-only "$c" 2>/dev/null
+    fi
+  done
 }
 
 # is_blocked <dir> <common> <sha>: a review BLOCKED this commit (by SHA or tree).
@@ -179,6 +247,41 @@ uncovered_commits() {
     files="$(git -C "$d" "${GITQ[@]}" show --remerge-diff --no-renames --format= --name-only "$m" 2>/dev/null)"
     [ -n "$files" ] || continue
     printf '\036%s\037merge resolution\n%s\n' "$m" "$files" | exempt_filter
+  done
+}
+
+# cover_rounds: with d, sha, common, new, nots[] and uncovered set by the
+# caller (bash locals are dynamic), applies the attestations in rounds and
+# sets tier, need, attested[] and uncovered. Returns 0 when nothing is left
+# uncovered. Each round: the attestations at the tier or higher cover their
+# ancestors, then the tier is computed again over the commits still
+# uncovered, so a docs commit after a max-reviewed code commit needs only its
+# own (low) level. Sound: a lower level is only ever asked for once every
+# commit at a higher tier is covered.
+cover_rounds() {
+  local prev=6 quals added c
+  while :; do
+    # shellcheck disable=SC2086
+    tier="$(commit_files "$d" $uncovered | review_tier)"
+    need="$(level_rank "$tier")"
+    [ "$need" -gt 0 ] || { tier=max; need=5; }
+    [ "$need" -lt "$prev" ] || return 1
+    prev="$need"
+    # New commits that hold a qualifying attestation (and no block).
+    quals="$(qualifying_shas "$common" "$need" | sort -u)"
+    added=0
+    if [ -n "$quals" ]; then
+      for c in $new; do
+        printf '%s\n' "$quals" | grep -qxF "$c" || continue
+        printf ' %s ' "${attested[*]:-}" | grep -qF " $c " && continue
+        is_blocked "$d" "$common" "$c" && continue
+        attested+=("$c")
+        added=1
+      done
+    fi
+    [ "$added" -eq 1 ] || return 1
+    uncovered="$(uncovered_commits "$d" "$sha" "${nots[@]}" "${attested[@]}")"
+    [ -z "$uncovered" ] && return 0
   done
 }
 
@@ -206,31 +309,27 @@ check_sha() {
     return 0
   fi
 
-  # New commits that hold a qualifying attestation (and no block).
-  local quals
-  quals="$(qualifying_shas "$common" | sort -u)"
-  if [ -n "$quals" ]; then
-    for c in $new; do
-      printf '%s\n' "$quals" | grep -qxF "$c" || continue
-      is_blocked "$d" "$common" "$c" && continue
-      attested+=("$c")
-    done
-  fi
-  if [ "${#attested[@]}" -gt 0 ]; then
-    uncovered="$(uncovered_commits "$d" "$sha" "${nots[@]}" "${attested[@]}")"
-    [ -z "$uncovered" ] && return 0
-  fi
+  # The review level this push needs: the tier of what the uncovered commits
+  # change (max when it cannot be read). Coverage is applied in rounds: the
+  # attestations at the tier or higher cover their ancestors, then the tier is
+  # computed again over the commits still uncovered, so a docs commit after a
+  # max-reviewed code commit needs only its own (low) level. Sound because each
+  # round only lowers the level for commits whose own files are at that tier.
+  local tier need
+  cover_rounds && return 0
 
-  log_decision "$common" block "$sha" "$ref" "$(printf '%s\n' "$uncovered" | grep -c .) uncovered commit(s)"
+  log_decision "$common" block "$sha" "$ref" "$(printf '%s\n' "$uncovered" | grep -c .) uncovered commit(s); tier $tier"
   {
-    echo "⛔ push-review-gate — '$ref' (${sha:0:8}) has code commits with no max-level review attestation:"
+    echo "⛔ push-review-gate — '$ref' (${sha:0:8}) has code commits with no review attestation at level $tier or higher (the diff's risk tier):"
     printf '%s\n' "$uncovered" | head -10 | while IFS= read -r c; do
       [ -n "$c" ] && echo "    $(git -C "$d" log -1 --format='%h %s' "$c" 2>/dev/null)"
     done
     echo
-    echo "Standing order (Garth 2026-11-11): ONE /code-review max pass on the final diff, at most one fix round, then attest and push:"
-    echo "  /code-review max → fix round → ATTEST_REVIEW_LEVEL=max $attest_cmd \"clean\"   (or \"findings-fixed: <summary>\")"
-    echo "No code (docs only)? Log an explicit waiver: $attest_cmd \"waived: docs-only: <reason>\""
+    echo "Standing order (Garth 2026-11-11, tiered 2026-11-14): ONE /code-review pass at the diff's tier on the final diff, at most one fix round, then attest and push:"
+    echo "  /code-review $tier → fix round → ATTEST_REVIEW_LEVEL=$tier $attest_cmd \"clean\"   (or \"findings-fixed: <summary>\")"
+    if [ "$need" -le 2 ]; then
+      echo "No code (docs or data only)? Log an explicit waiver: $attest_cmd \"waived: docs-only: <reason>\""
+    fi
     echo "Pushing only for HUMAN review (no merge authority wanted)? PUSH_GATE_WAIVE=<reason> git push …"
   } >&2
   return 2
@@ -254,7 +353,7 @@ check_pending_commit() {
   if printf '\036%s\037pending\n%s\n' 0000000 "$files" | exempt_filter | grep -q .; then
     {
       echo "⛔ push-review-gate — this command commits and then pushes, so the new commit cannot have a review attestation yet."
-      echo "Commit first, then ONE /code-review max on the final diff → ATTEST_REVIEW_LEVEL=max scripts/attest-review.sh \"clean\" → push as its own command."
+      echo "Commit first, then ONE /code-review <tier> on the final diff (tier: bash .claude/hooks/push-review-gate.sh --tier) → ATTEST_REVIEW_LEVEL=<tier> scripts/attest-review.sh \"clean\" → push as its own command."
     } >&2
     return 2
   fi
@@ -360,6 +459,64 @@ check_push() {
 
 # Walk the command clause by clause: `cd` moves the directory, `git … push`
 # is judged where it runs (its own -C wins).
+# Diff/log output must not depend on the reader's git config.
+GITQ=(-c core.quotePath=false -c diff.relative=false -c log.showRoot=true -c diff.renames=false)
+
+# `push-review-gate.sh --tier [<base-ref>]` (in a checkout): prints the level
+# the pre-push review of HEAD must run at: the tier of the commits not yet on
+# origin/<integration|prod> (or <base-ref>) and not yet covered by an
+# attestation, by the same rounds the gate applies, and of any uncommitted or
+# untracked file (the higher wins; `--committed` leaves those out, for
+# attest-review.sh). Nothing left to review: low. Any error: max. `--tier-paths`: the tier of the paths read on stdin.
+# Loops call this to pick the /code-review level; attest-review.sh calls it to
+# refuse a level below it (or a waiver above medium); the gate enforces it.
+if [ "${1:-}" = --tier ] || [ "${1:-}" = --tier-paths ]; then
+  if [ "$1" = --tier-paths ]; then review_tier; exit 0; fi
+  d="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo max; exit 0; }
+  common="$(git -C "$d" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || { echo max; exit 0; }
+  sha="$(git -C "$d" rev-parse -q --verify HEAD 2>/dev/null)" || { echo max; exit 0; }
+  nots=() base="" committed=0
+  for a in "${@:2}"; do
+    case "$a" in --committed) committed=1 ;; *) base="$a" ;; esac
+  done
+  if [ -n "$base" ]; then
+    git -C "$d" rev-parse -q --verify "$base" >/dev/null 2>&1 || { echo max; exit 0; }
+    nots+=("$base")
+  else
+    for b in "$integration_branch" "$prod_branch"; do
+      [ -n "$b" ] && git -C "$d" rev-parse -q --verify "refs/remotes/origin/$b" >/dev/null 2>&1 && nots+=("refs/remotes/origin/$b")
+    done
+  fi
+  [ "${#nots[@]}" -gt 0 ] || { echo max; exit 0; }
+  # Work not committed yet counts too: a loop may ask before it commits.
+  dirty="$( { git -C "$d" "${GITQ[@]}" diff --name-only HEAD && git -C "$d" ls-files --others --exclude-standard; } 2>/dev/null)" || { echo max; exit 0; }
+  t_dirty=""
+  [ -n "$dirty" ] && [ "$committed" -eq 0 ] && t_dirty="$(printf '%s\n' "$dirty" | review_tier)"
+  t_commits=low
+  new="$(git -C "$d" rev-list "$sha" --not "${nots[@]}" 2>/dev/null)" || { echo max; exit 0; }
+  if [ -n "$new" ]; then
+    uncovered="$(uncovered_commits "$d" "$sha" "${nots[@]}")"
+    attested=()
+    if [ -n "$uncovered" ] && ! cover_rounds; then t_commits="${tier:-max}"; fi
+  fi
+  if [ -n "$t_dirty" ] && [ "$(level_rank "$t_dirty")" -gt "$(level_rank "$t_commits")" ]; then echo "$t_dirty"; else echo "$t_commits"; fi
+  exit 0
+fi
+
+payload="$(cat 2>/dev/null)" || exit 0
+[ -n "$payload" ] || exit 0
+command -v jq >/dev/null 2>&1 || exit 0
+cmd="$(printf '%s' "$payload" | jq -r '.tool_input.command // empty' 2>/dev/null)"
+[ -n "$cmd" ] || exit 0
+case "$cmd" in *push*) ;; *) exit 0 ;; esac
+
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." 2>/dev/null && pwd)" || exit 0
+self_common="$(git -C "$here" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || exit 0
+self_origin="$(git -C "$here" remote get-url origin 2>/dev/null | sed -E 's#\.git$##; s#/+$##')"
+attest_cmd="$here/scripts/attest-review.sh"
+hook_cwd="$(printf '%s' "$payload" | jq -r '.cwd // empty' 2>/dev/null)"
+start_dir="${hook_cwd:-${CLAUDE_PROJECT_DIR:-$PWD}}"
+
 status=0
 dir="$start_dir"
 committed_dirs=""

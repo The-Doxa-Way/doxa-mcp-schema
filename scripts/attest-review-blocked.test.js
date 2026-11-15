@@ -40,7 +40,7 @@ function tmpRepo() {
 }
 
 function attest(dir, verdict) {
-  const r = spawnSync('bash', ['scripts/attest-review.sh', verdict], { cwd: dir, encoding: 'utf8' });
+  const r = spawnSync('bash', ['scripts/attest-review.sh', verdict], { cwd: dir, encoding: 'utf8', env: { ...process.env, ATTEST_REVIEW_LEVEL: 'max' } }); // a review verdict needs its level (doxa-cns #3039)
   return { code: r.status, out: r.stdout + r.stderr };
 }
 
