@@ -1,5 +1,5 @@
 {
-  "merkleRoot": "40a5bdb3f00097a7525c86bdfa9b553011a17696b799f0882e619b20fb1ea876",
+  "merkleRoot": "d7d1bb03ea0a13f8bf307f8da290a4814b7278c7aa7c70e2d1e7bbea1340754d",
   "observations": [
     {
       "hash": "8c4477b4f683bf830b6fd91bf6958d79596304ddb08a8852ef827504a812d42e",
@@ -236,9 +236,26 @@
         "entityType": "Reference"
       },
       "timestamp": "2026-11-14T16:00:37.659Z"
+    },
+    {
+      "hash": "3d174735de85bfab8eb21baa14eb36e2cece66aae825582b87b526be8b615683",
+      "entityName": "ReviewTierByDiffRiskDoctrine",
+      "content": "2026-11-15: gates re-rendered from doxa-cns fleet/gates (#3013, #3039, #3041). The pre-push review level follows the diff risk tier: bash .claude/hooks/push-review-gate.sh --tier prints low (prose docs), medium (tests, listed data) or max (every other path); attest-review.sh refuses a level below the tier, a waived: row above medium, and a review verdict with no ATTEST_REVIEW_LEVEL. A Monitor ws-source payload has no command, so the gates pass it (a socket cannot push or merge). CLAUDE.md now says /code-review <tier>.",
+      "provenance": {
+        "sourceFile": ".claude/hooks/push-review-gate.sh",
+        "lineNumber": 1,
+        "lineRange": null,
+        "fileHash": "e80ae39cb13c0dc6fe4c6ad7fe72f02da0c7f78b960e92133001ac4ca25a0d26",
+        "totalLines": 594,
+        "extractedAt": "2026-11-15T11:03:18.735Z",
+        "verificationStatus": "verified",
+        "extractedBy": "knowledge-graph-merkle.js",
+        "entityType": "Reference"
+      },
+      "timestamp": "2026-11-15T11:03:18.735Z"
     }
   ],
   "lastVerified": "2026-11-14T08:54:03.220Z",
   "version": 1,
-  "lastModified": "2026-11-14T16:00:37.685Z"
+  "lastModified": "2026-11-15T11:03:18.743Z"
 }

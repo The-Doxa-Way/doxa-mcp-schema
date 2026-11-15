@@ -25,11 +25,16 @@
 #
 # Optional env ATTEST_REVIEW_LEVEL (low|medium|high|xhigh|max — the /code-review
 # effort level that ran) adds a "review_level" field to the jsonl row and to the
-# portable note. Garth 2026-11-11: every push needs ONE `/code-review max` pass,
-# and .claude/hooks/push-review-gate.sh accepts only review_level "max" (or an
-# explicit `waived:`). Unset, the row is as before; any other value is refused.
+# portable note. Garth 2026-11-11 (tiered 2026-11-14): every push needs ONE
+# `/code-review <tier>` pass, where <tier> is what
+# `bash .claude/hooks/push-review-gate.sh --tier` prints for the diff, and
+# push-review-gate.sh accepts only a review_level at that tier or higher (or an
+# explicit `waived:` for a low/medium tier). A level below the tier, or a
+# waiver above medium, is refused here. Unset, the row is as before; any other value is refused.
 #
-#   ATTEST_REVIEW_LEVEL=max scripts/attest-review.sh "clean"
+#   bash .claude/hooks/push-review-gate.sh --tier      # BEFORE the review: the level to run
+#   ATTEST_REVIEW_LEVEL=<the level that ran> scripts/attest-review.sh "clean"   # AFTER it
+# Never compute ATTEST_REVIEW_LEVEL from --tier: the field records what ran.
 #
 # The ledger lives in the repo's .git dir (survives within a clone, never
 # committed, never churns the tree). This is PROCESS enforcement — it makes
@@ -113,6 +118,49 @@ case "$verdict_lc" in
     fi ;;
 esac
 
+# Tier minimum (Garth 2026-11-14, tiered review): a review level below the
+# diff's risk tier is refused here, so the push gate never meets it; a
+# `waived:` verdict is refused when the tier is above medium; and a review
+# verdict with no ATTEST_REVIEW_LEVEL is refused. The refusal is here, at the
+# writer agents use, because review-gate.sh and the auto-lander (openclaw
+# land-prs.mjs) accept any row that is not `waived-tests:` as merge authority,
+# and CI reuses a level-less review note (it rejects only waivers). The tier
+# is what this repo's push-review-gate.sh --tier --committed prints for HEAD:
+# the committed work only, since an unrelated dirty file is neither attested
+# nor pushed (max on any error: fail closed).
+tier=""
+tier_rank() { case "$1" in low) echo 1 ;; medium) echo 2 ;; high) echo 3 ;; xhigh) echo 4 ;; max) echo 5 ;; *) echo 5 ;; esac; }
+diff_tier() {
+  # stdin closed: an older copy of the hook reads a payload from stdin.
+  # No hook, no output or an error: max (fail closed).
+  local hook t
+  hook="$(git rev-parse --show-toplevel 2>/dev/null)/.claude/hooks/push-review-gate.sh"
+  [ -f "$hook" ] || { echo max; return; }
+  t="$(bash "$hook" --tier --committed </dev/null 2>/dev/null)" || t=max
+  echo "${t:-max}"
+}
+case "$verdict_lc" in
+  waived-tests:*|blocked:*) ;;
+  waived:*)
+    tier="$(diff_tier)"
+    if [ "$(tier_rank "$tier")" -gt 2 ]; then
+      echo "attest-review.sh: refusing — this diff's risk tier is $tier, so it cannot be waived (a waiver is only for a low or medium tier: prose docs, tests, listed data). Run /code-review $tier, then ATTEST_REVIEW_LEVEL=$tier." >&2
+      exit 2
+    fi ;;
+  *)
+    if [ -z "$review_level" ]; then
+      echo "attest-review.sh: refusing — a review verdict needs ATTEST_REVIEW_LEVEL (the /code-review level that ran). Tier for this diff: bash .claude/hooks/push-review-gate.sh --tier" >&2
+      exit 2
+    fi
+    if [ -n "$review_level" ]; then
+      tier="$(diff_tier)"
+      if [ "$(tier_rank "$review_level")" -lt "$(tier_rank "$tier")" ]; then
+        echo "attest-review.sh: refusing — this diff's risk tier is $tier, so its /code-review must run at $tier or higher, not $review_level. Run /code-review $tier, then ATTEST_REVIEW_LEVEL=$tier." >&2
+        exit 2
+      fi
+    fi ;;
+esac
+
 # Structured verdict label (jev-specialist-roles slice 05 step 0): a
 # best-effort parse of $verdict into findings/rounds/tests, added to the
 # jsonl line as "parsed" when it succeeds. This is a label column for a
@@ -149,7 +197,7 @@ if [ -n "$review_level" ]; then
   row="$(printf '%s' "$row" | jq -c --arg l "$review_level" '. + {review_level:$l}')"
 fi
 printf '%s\n' "$row" >> "$common/review-attest.jsonl"
-echo "attested: $branch@${sha:0:8} — $verdict${review_level:+ (review level: $review_level)}"
+echo "attested: $branch@${sha:0:8} — $verdict${review_level:+ (review level: $review_level)}${tier:+ (diff tier: $tier)}"
 
 if command -v node >/dev/null 2>&1 && [ -f "$script_dir/review-attest-note.mjs" ]; then
   at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"

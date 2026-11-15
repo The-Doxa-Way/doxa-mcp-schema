@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# review-gate.sh — PreToolUse hook for the GitHub MCP merge tool (and Bash
-# `gh pr merge` where settings.json wires it on the Bash matcher).
+# review-gate.sh — PreToolUse hook for the GitHub MCP merge tool (and Bash or
+# Monitor `gh pr merge` where settings.json wires it on the Bash|Monitor matcher).
 #
 # Garth's standing rule (2026-07-16): every doxa-mcp-schema chunk lands through the
 # recursive-quality-gate with an independent review pass — and that must be
@@ -394,10 +394,10 @@ fi
   echo 'Every doxa-mcp-schema chunk merges only after its independent review pass (CLAUDE.md Landing doctrine — self-review never counts).'
   echo "Run the review on the final diff, fix findings, then attest and retry:"
   echo
-  echo "  /code-review max (Garth 2026-11-11) → one fix round →"
-  echo "  ATTEST_REVIEW_LEVEL=max scripts/attest-review.sh \"clean\"   (or \"findings-fixed: <summary>\")"
+  echo "  /code-review <tier> (tier: bash .claude/hooks/push-review-gate.sh --tier) → one fix round →"
+  echo "  ATTEST_REVIEW_LEVEL=<the level that ran> scripts/attest-review.sh \"clean\"   (or \"findings-fixed: <summary>\")"
   echo
-  echo "Genuinely reviewless landing (generated state only)? Log an explicit waiver:"
+  echo "Low- or medium-tier diff only (prose docs, tests, listed data)? Log an explicit waiver:"
   echo "  scripts/attest-review.sh \"waived: <reason>\""
 } >&2
 exit 2

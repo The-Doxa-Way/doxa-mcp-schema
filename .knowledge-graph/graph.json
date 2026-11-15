@@ -79,6 +79,13 @@
       "observations": [
         "2026-11-14 doxa-mcp-schema: the 4 PreToolUse gate hooks (kg-save, review, push-review, test) in .claude/settings.json moved from matcher Bash to Bash|Monitor; Claude Code 2.1.310 fires Bash hooks only for Bash, so git push / gh pr merge through Monitor skipped them. scripts/hook-matchers-monitor.test.js (same file as doxa-brand #129) fails on a Bash-only entry."
       ]
+    },
+    {
+      "name": "ReviewTierByDiffRiskDoctrine",
+      "entityType": "Reference",
+      "observations": [
+        "2026-11-15: gates re-rendered from doxa-cns fleet/gates (#3013, #3039, #3041). The pre-push review level follows the diff risk tier: bash .claude/hooks/push-review-gate.sh --tier prints low (prose docs), medium (tests, listed data) or max (every other path); attest-review.sh refuses a level below the tier, a waived: row above medium, and a review verdict with no ATTEST_REVIEW_LEVEL. A Monitor ws-source payload has no command, so the gates pass it (a socket cannot push or merge). CLAUDE.md now says /code-review <tier>."
+      ]
     }
   ],
   "relations": []

@@ -43,16 +43,17 @@ TypeScript 7 ships `tsc` in optional platform packages).
 The production branch is `main`. Every change lands by branch, PR, independent review, merge.
 Self-review never counts.
 
-- Order: commit the change and its kg-save. Then run one `/code-review max` pass on the final
+- Order: commit the change and its kg-save. Then run one `/code-review <tier>` pass on the final
   diff on claude-opus-5-5, with at most one fix round. Then attest and push.
-- Attest with `ATTEST_REVIEW_LEVEL=max ATTEST_REVIEWER_MODEL=claude-opus-5-5 scripts/attest-review.sh "<verdict>"`.
+  `<tier>` = what `bash .claude/hooks/push-review-gate.sh --tier` prints: low for prose docs, medium for tests and listed data, max for every other path.
+- Attest with `ATTEST_REVIEW_LEVEL=<the level that ran> ATTEST_REVIEWER_MODEL=claude-opus-5-5 scripts/attest-review.sh "<verdict>"`.
   An attestation is for one SHA. Attest again after any later commit.
 - kg-save: `node scripts/knowledge-graph-merkle.js add "<Entity>" "<what and why>" <source-file> --type <Type>`.
   Commit `.knowledge-graph/` and `.knowledge-graph-merkle.json`. Save only facts about this repo,
   under a repo-scoped name. Fleet and gate facts go to the CNS KG.
 - `[skip-kg]` is only for a knowledge-free change, in the PR title and in the push command.
 - `.claude/hooks/` run in a Claude Code session opened in this repo. `push-review-gate.sh`
-  blocks a push with no max attestation. `kg-save-gate.sh` blocks a push, PR or merge with no KG
+  blocks a push with no attestation at the diff's tier (`--tier`). `kg-save-gate.sh` blocks a push, PR or merge with no KG
   change, and a merge while KG Guard is red or pending. `review-gate.sh` blocks a merge with no
   attestation. `test-gate.sh` blocks a code change with no test change (waiver:
   `scripts/attest-review.sh "waived-tests: <reason>"`). From another root, run the checks yourself.
