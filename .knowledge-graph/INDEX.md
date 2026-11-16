@@ -24,6 +24,10 @@
 
 - TypeScript7ServerBuild — 2026-11-07 pr-banker banked dependabot #20 (typescript 5.9.3 -> 7.0.2 in server/). TS 6+ defaults compilerOpt…
 
+## System (1)
+
+- FleetGateReviewModes — 2026-11-16: gates re-rendered from doxa-cns #3050 (two max modes). Max diffs: ONE opus-reviewer pass (prompt …
+
 ## Workflow (1)
 
 - DoxaMcpSchemaLandingGatesInfra — Bootstrapped Doxa's standard landing-gate infrastructure into doxa-mcp-schema (2026-08-11): KG Guard + Claude…

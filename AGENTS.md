@@ -59,7 +59,7 @@ Self-review never counts.
 
 - Order: commit the change and its kg-save. Then run one `/code-review <tier>` pass on the final
   diff on claude-opus-5-5, with at most one fix round. Then attest and push.
-  `<tier>` = what `bash .claude/hooks/push-review-gate.sh --tier` prints: low for prose docs, medium for tests and listed data, max for every other path.
+  `<tier>` = what `bash .claude/hooks/push-review-gate.sh --tier` prints: low for prose docs, medium for tests and listed data, max for every other path, max-fanout for the critical set (auth, credentials, gate/hook/CI files, SQL). max = ONE `opus-reviewer` pass (no fan-out); max-fanout = `/code-review max`, the fan-out..
 - Attest with `ATTEST_REVIEW_LEVEL=<the level that ran> ATTEST_REVIEWER_MODEL=claude-opus-5-5 scripts/attest-review.sh "<verdict>"`.
   An attestation is for one SHA. Attest again after any later commit.
 - kg-save: `node scripts/knowledge-graph-merkle.js add "<Entity>" "<what and why>" <source-file> --type <Type>`.

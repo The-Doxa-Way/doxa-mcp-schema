@@ -394,7 +394,7 @@ fi
   echo 'Every doxa-mcp-schema chunk merges only after its independent review pass (CLAUDE.md Landing doctrine — self-review never counts).'
   echo "Run the review on the final diff, fix findings, then attest and retry:"
   echo
-  echo "  /code-review <tier> (tier: bash .claude/hooks/push-review-gate.sh --tier) → one fix round →"
+  echo "  the review the tier names (tier: bash .claude/hooks/push-review-gate.sh --tier; low/medium: /code-review <tier>; max: ONE opus-reviewer pass; max-fanout: /code-review max) → one fix round →"
   echo "  ATTEST_REVIEW_LEVEL=<the level that ran> scripts/attest-review.sh \"clean\"   (or \"findings-fixed: <summary>\")"
   echo
   echo "Low- or medium-tier diff only (prose docs, tests, listed data)? Log an explicit waiver:"
