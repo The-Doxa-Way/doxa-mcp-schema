@@ -119,6 +119,12 @@ tier_max_re='^\.github/|^\.claude/|^agent-home/|^fleet/|^config/|^agents/|^learn
 tier_fanout_re='^\.github/|^\.claude/hooks/|^agent-home/hooks/|(^|/)\.githooks/|(^|/)\.husky/|(^|/)user-hooks[^/]*$|(^|/)\.?gitleaks[^/]*$|^\.claude/settings[^/]*\.json$|^\.claude/agents/opus-reviewer\.md$|^\.claude/commands/(merge-to-main|merge-to-staging|recursive-quality-gate)\.md$|^fleet/gates/|^config/fleet\.ya?ml$|(^|/)protected-paths\.ya?ml$|(^|/)(attest-review|review-attest|review-preflight|land-prs|check-kg-merge-integrity)[^/]*$|^\.claude/agents/[^/]*review[^/]*\.md$|^\.claude/commands/[^/]*review[^/]*\.md$|^goals/convert/experiments/|^learnings/policy\.ya?ml$|^goals/evidence-policy\.ya?ml$|^scripts/(lib/)?(loop-ledger|evidence-contract|evidence-verify|experiment-contract|goal-grader|experiment-grader|experiment-validate|cns-push-mode|cns-push)\.[cm]?js$|^scripts/cron/cns-push\.js$|\.sql$|(^|/)migrations?/|(^|/)schema[^/]*\.(sql|prisma)$'
 tier_kw_re='(^|[/_.-])gates?([/_.-]|$)|paywall|premium|entitle|stripe|revenuecat|(^|[^a-z])iap([^a-z]|$)|receipt|storekit|play-?billing|server-notifications|play-notifications|portal-session|pricing|billing|subscri|checkout|purchase|payment|invoice|auth([^o]|o[^r]|$)|authori[sz]|login|passw|secret|credential|keychain|token|jwt|api-?key|mcp-key|(^|[^a-z])rls([^a-z]|$)|polic|permission|secur|crypt|signing|signature|encourag|safety|moderat|crisis|age-?gate|consent|privacy|gdpr|outbound|send-mode|email|mailer|outreach|nurture|user[-_]?data|personal[-_]?data|(^|[^a-z])pii|delete[-_]?account|account[-_]?deletion|data[-_]?export|export[-_]?(data|account)|(^|/)config\.toml$'
 tier_extra_max_re=''
+# A repo's own critical set (config/fleet.yaml gates.fanoutPaths): paths the
+# generic lists miss that must get the fan-out too (doxa-app: push and outbound
+# sends, user data, encourager safety, store and release machinery). It joins
+# tier_fanout_re, so an exempt subject never exempts these paths either.
+tier_extra_fanout_re=''
+[ -n "$tier_extra_fanout_re" ] && tier_fanout_re="$tier_fanout_re|$tier_extra_fanout_re"
 tier_doc_re='^(docs|specs|handoffs|proposals|evals|goals)/.*\.mdx?$|(^|/)(README|CHANGELOG)\.md$'
 tier_medium_re='\.(test|spec)\.[cm]?[jt]sx?$|(^|/)(__tests__|tests?)/|(^|/)test_[^/]+\.py$|^(goals/_reports|evals|handoffs|proposals|scripts/data)/.*\.(json|jsonl|csv|tsv|ya?ml)$|(^|/)(fixtures|results)/.*\.(json|jsonl|csv|tsv|ya?ml)$'
 
@@ -144,8 +150,9 @@ review_tier() {
       n++
       doc = (p ~ ENVIRON["DOC_RE"])
       # camelCase names keep their word boundaries (GraceRecordRLS, useIAP, stripPII):
-      # the keywords also see the name with a _ at each lower-to-upper step.
-      w = p; while (match(w, /[a-z0-9][A-Z]/)) w = substr(w, 1, RSTART) "_" substr(w, RSTART + 1)
+      # the keywords also see the name with a _ at each lower-to-upper step and
+      # before the last capital of an acronym that starts a word (IAPService).
+      w = p; while (match(w, /[a-z0-9][A-Z]|[A-Z][A-Z][a-z]/)) w = substr(w, 1, RSTART) "_" substr(w, RSTART + 1)
       if (p ~ ENVIRON["FAN_RE"] || (!doc && (tolower(p) ~ ENVIRON["KW_RE"] || tolower(w) ~ ENVIRON["KW_RE"] || p ~ /[a-z]Gates?([A-Z._-]|$)/))) t = "max-fanout"
       else if (p ~ ENVIRON["MAX_RE"] || (ENVIRON["XMAX_RE"] != "" && p ~ ENVIRON["XMAX_RE"])) t = "max"
       else if (doc) t = "low"
@@ -364,7 +371,7 @@ check_pending_commit() {
       elif [ "${#add_paths[@]}" -gt 0 ]; then
         git -C "$d" "${GITQ[@]}" ls-files -m -o --exclude-standard --full-name -- "${add_paths[@]}"
       fi
-      [ "$commit_all" = 1 ] && git -C "$d" diff --name-only
+      [ "$commit_all" = 1 ] && git -C "$d" "${GITQ[@]}" diff --name-only
     } 2>/dev/null | sort -u)" || return 0
   [ -n "$files" ] || return 0
   if printf '\036%s\037pending\n%s\n' 0000000 "$files" | exempt_filter | grep -q .; then
