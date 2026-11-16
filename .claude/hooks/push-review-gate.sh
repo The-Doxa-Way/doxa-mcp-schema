@@ -360,9 +360,9 @@ check_pending_commit() {
   files="$( {
       git -C "$d" "${GITQ[@]}" diff --name-only --cached
       if [ "$add_all" = 1 ]; then
-        git -C "$d" "${GITQ[@]}" diff --name-only; git -C "$d" "${GITQ[@]}" ls-files --others --exclude-standard
+        git -C "$d" "${GITQ[@]}" diff --name-only; git -C "$d" "${GITQ[@]}" ls-files --others --exclude-standard --full-name -- ':/'
       elif [ "${#add_paths[@]}" -gt 0 ]; then
-        git -C "$d" "${GITQ[@]}" ls-files -m -o --exclude-standard -- "${add_paths[@]}"
+        git -C "$d" "${GITQ[@]}" ls-files -m -o --exclude-standard --full-name -- "${add_paths[@]}"
       fi
       [ "$commit_all" = 1 ] && git -C "$d" diff --name-only
     } 2>/dev/null | sort -u)" || return 0
