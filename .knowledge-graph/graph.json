@@ -86,6 +86,13 @@
       "observations": [
         "2026-11-15: gates re-rendered from doxa-cns fleet/gates (#3013, #3039, #3041). The pre-push review level follows the diff risk tier: bash .claude/hooks/push-review-gate.sh --tier prints low (prose docs), medium (tests, listed data) or max (every other path); attest-review.sh refuses a level below the tier, a waived: row above medium, and a review verdict with no ATTEST_REVIEW_LEVEL. A Monitor ws-source payload has no command, so the gates pass it (a socket cannot push or merge). CLAUDE.md now says /code-review <tier>."
       ]
+    },
+    {
+      "name": "FleetGateReviewModes",
+      "entityType": "System",
+      "observations": [
+        "2026-11-16: gates re-rendered from doxa-cns #3050 (two max modes). Max diffs: ONE opus-reviewer pass (prompt review-mode max <worktree>); max-fanout (money/auth/SQL/user data/safety/outbound/gate machinery): /code-review max fan-out. attest-review.sh fails closed to max-fanout when it cannot read the tier; the attest test fixture moved to max-fanout; CLAUDE.md names both modes."
+      ]
     }
   ],
   "relations": []
