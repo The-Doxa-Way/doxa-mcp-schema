@@ -116,8 +116,8 @@ code_re='(\.(c|m)?js|\.ts|\.tsx|\.sh|\.py|\.ya?ml)$|^\.claude/|^\.github/|^bin/|
 # low or medium tier) but no path tiers high: Experiment 1 tested only medium
 # against max. scripts/push-review-gate.test.mjs pins this.
 tier_max_re='^\.github/|^\.claude/|^agent-home/|^fleet/|^config/|^agents/|^learnings/|^ontology/|^authority/|^vault/00-MOCs/|(^|/)(CLAUDE|AGENTS|SKILL)\.md$|(^|/)skills/|(^|/)PROMPT[^/]*\.md$|-tick-prompt\.md$|^goals/[^/]+/GOAL\.md$|^goals/convert/experiments/|^docs/cns-reference\.md$|^docs/landing/|^evals/[^/]+/(rubric|judge|grader)|\.sql$'
-tier_fanout_re='^\.github/|^\.claude/hooks/|^agent-home/hooks/|(^|/)\.githooks/|(^|/)\.husky/|(^|/)user-hooks[^/]*$|(^|/)\.?gitleaks[^/]*$|^\.claude/settings[^/]*\.json$|^\.claude/agents/opus-reviewer\.md$|^\.claude/commands/(merge-to-main|merge-to-staging|recursive-quality-gate)\.md$|^fleet/gates/|^config/fleet\.ya?ml$|(^|/)protected-paths\.ya?ml$|(^|/)(attest-review|review-attest|review-preflight|land-prs)[^/]*$|^\.claude/agents/[^/]*review[^/]*\.md$|^\.claude/commands/[^/]*review[^/]*\.md$|^goals/convert/experiments/|^learnings/policy\.ya?ml$|^goals/evidence-policy\.ya?ml$|^scripts/(lib/)?(loop-ledger|evidence-contract|evidence-verify|experiment-contract|goal-grader|experiment-grader|experiment-validate|cns-push-mode|cns-push)\.[cm]?js$|^scripts/cron/cns-push\.js$|\.sql$|(^|/)migrations?/|(^|/)schema[^/]*\.(sql|prisma)$'
-tier_kw_re='(^|[/_.-])gates?([/_.-]|$)|paywall|premium|entitle|stripe|revenuecat|(^|[^a-z])iap([^a-z]|$)|receipt|storekit|play-?billing|server-notifications|play-notifications|portal-session|pricing|billing|subscri|checkout|purchase|payment|invoice|auth([^o]|o[^r]|$)|login|passw|secret|credential|keychain|token|jwt|api-?key|mcp-key|(^|[^a-z])rls([^a-z]|$)|polic|permission|secur|crypt|signing|signature|encourag|safety|moderat|crisis|age-?gate|consent|privacy|gdpr|outbound|send-mode|email|mailer|outreach|nurture|user[-_]?data|personal[-_]?data|(^|[^a-z])pii|delete[-_]?account|account[-_]?deletion|data[-_]?export|export[-_]?(data|account)|(^|/)config\.toml$'
+tier_fanout_re='^\.github/|^\.claude/hooks/|^agent-home/hooks/|(^|/)\.githooks/|(^|/)\.husky/|(^|/)user-hooks[^/]*$|(^|/)\.?gitleaks[^/]*$|^\.claude/settings[^/]*\.json$|^\.claude/agents/opus-reviewer\.md$|^\.claude/commands/(merge-to-main|merge-to-staging|recursive-quality-gate)\.md$|^fleet/gates/|^config/fleet\.ya?ml$|(^|/)protected-paths\.ya?ml$|(^|/)(attest-review|review-attest|review-preflight|land-prs|check-kg-merge-integrity)[^/]*$|^\.claude/agents/[^/]*review[^/]*\.md$|^\.claude/commands/[^/]*review[^/]*\.md$|^goals/convert/experiments/|^learnings/policy\.ya?ml$|^goals/evidence-policy\.ya?ml$|^scripts/(lib/)?(loop-ledger|evidence-contract|evidence-verify|experiment-contract|goal-grader|experiment-grader|experiment-validate|cns-push-mode|cns-push)\.[cm]?js$|^scripts/cron/cns-push\.js$|\.sql$|(^|/)migrations?/|(^|/)schema[^/]*\.(sql|prisma)$'
+tier_kw_re='(^|[/_.-])gates?([/_.-]|$)|paywall|premium|entitle|stripe|revenuecat|(^|[^a-z])iap([^a-z]|$)|receipt|storekit|play-?billing|server-notifications|play-notifications|portal-session|pricing|billing|subscri|checkout|purchase|payment|invoice|auth([^o]|o[^r]|$)|authori[sz]|login|passw|secret|credential|keychain|token|jwt|api-?key|mcp-key|(^|[^a-z])rls([^a-z]|$)|polic|permission|secur|crypt|signing|signature|encourag|safety|moderat|crisis|age-?gate|consent|privacy|gdpr|outbound|send-mode|email|mailer|outreach|nurture|user[-_]?data|personal[-_]?data|(^|[^a-z])pii|delete[-_]?account|account[-_]?deletion|data[-_]?export|export[-_]?(data|account)|(^|/)config\.toml$'
 tier_extra_max_re=''
 tier_doc_re='^(docs|specs|handoffs|proposals|evals|goals)/.*\.mdx?$|(^|/)(README|CHANGELOG)\.md$'
 tier_medium_re='\.(test|spec)\.[cm]?[jt]sx?$|(^|/)(__tests__|tests?)/|(^|/)test_[^/]+\.py$|^(goals/_reports|evals|handoffs|proposals|scripts/data)/.*\.(json|jsonl|csv|tsv|ya?ml)$|(^|/)(fixtures|results)/.*\.(json|jsonl|csv|tsv|ya?ml)$'
@@ -143,7 +143,10 @@ review_tier() {
       if (!authored && ENVIRON["GEN_RE"] != "" && p ~ ENVIRON["GEN_RE"]) { k++; next }
       n++
       doc = (p ~ ENVIRON["DOC_RE"])
-      if (p ~ ENVIRON["FAN_RE"] || (!doc && (tolower(p) ~ ENVIRON["KW_RE"] || p ~ /[a-z]Gates?([A-Z._-]|$)/))) t = "max-fanout"
+      # camelCase names keep their word boundaries (GraceRecordRLS, useIAP, stripPII):
+      # the keywords also see the name with a _ at each lower-to-upper step.
+      w = p; while (match(w, /[a-z0-9][A-Z]/)) w = substr(w, 1, RSTART) "_" substr(w, RSTART + 1)
+      if (p ~ ENVIRON["FAN_RE"] || (!doc && (tolower(p) ~ ENVIRON["KW_RE"] || tolower(w) ~ ENVIRON["KW_RE"] || p ~ /[a-z]Gates?([A-Z._-]|$)/))) t = "max-fanout"
       else if (p ~ ENVIRON["MAX_RE"] || (ENVIRON["XMAX_RE"] != "" && p ~ ENVIRON["XMAX_RE"])) t = "max"
       else if (doc) t = "low"
       else if (p ~ ENVIRON["MED_RE"]) t = "medium"
@@ -355,11 +358,11 @@ check_pending_commit() {
   local d="$1" files
   [ -n "$d" ] && [ -d "$d" ] || return 0
   files="$( {
-      git -C "$d" diff --name-only --cached
+      git -C "$d" "${GITQ[@]}" diff --name-only --cached
       if [ "$add_all" = 1 ]; then
-        git -C "$d" diff --name-only; git -C "$d" ls-files --others --exclude-standard
+        git -C "$d" "${GITQ[@]}" diff --name-only; git -C "$d" "${GITQ[@]}" ls-files --others --exclude-standard
       elif [ "${#add_paths[@]}" -gt 0 ]; then
-        git -C "$d" ls-files -m -o --exclude-standard -- "${add_paths[@]}"
+        git -C "$d" "${GITQ[@]}" ls-files -m -o --exclude-standard -- "${add_paths[@]}"
       fi
       [ "$commit_all" = 1 ] && git -C "$d" diff --name-only
     } 2>/dev/null | sort -u)" || return 0
@@ -503,7 +506,7 @@ if [ "${1:-}" = --tier ] || [ "${1:-}" = --tier-paths ]; then
   fi
   [ "${#nots[@]}" -gt 0 ] || { echo max-fanout; exit 0; }
   # Work not committed yet counts too: a loop may ask before it commits.
-  dirty="$( { git -C "$d" "${GITQ[@]}" diff --name-only HEAD && git -C "$d" ls-files --others --exclude-standard; } 2>/dev/null)" || { echo max-fanout; exit 0; }
+  dirty="$( { git -C "$d" "${GITQ[@]}" diff --name-only HEAD && git -C "$d" "${GITQ[@]}" ls-files --others --exclude-standard; } 2>/dev/null)" || { echo max-fanout; exit 0; }
   t_dirty=""
   [ -n "$dirty" ] && [ "$committed" -eq 0 ] && t_dirty="$(printf '%s\n' "$dirty" | review_tier)"
   t_commits=low
