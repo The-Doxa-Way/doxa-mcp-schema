@@ -23,8 +23,9 @@
 # Optional env ATTEST_REVIEWER_MODEL (e.g. claude-opus-5-5, the pinned review
 # tier) adds a "reviewer_model" field to the jsonl row; unset, the row is as before.
 #
-# Optional env ATTEST_REVIEW_LEVEL (low|medium|high|xhigh|max — the /code-review
-# effort level that ran) adds a "review_level" field to the jsonl row and to the
+# Optional env ATTEST_REVIEW_LEVEL (low|medium|high|xhigh|max|max-fanout — the
+# review that ran: low..xhigh a /code-review at that level, max ONE opus-reviewer
+# pass at max effort, max-fanout the /code-review max finder fan-out) adds a "review_level" field to the jsonl row and to the
 # portable note. Garth 2026-11-11 (tiered 2026-11-14): every push needs ONE
 # `/code-review <tier>` pass, where <tier> is what
 # `bash .claude/hooks/push-review-gate.sh --tier` prints for the diff, and
@@ -82,8 +83,8 @@ esac
 findings="${2:-}"
 review_level="$(printf '%s' "${ATTEST_REVIEW_LEVEL:-}" | tr '[:upper:]' '[:lower:]')"
 case "$review_level" in
-  ''|low|medium|high|xhigh|max) ;;
-  *) echo "attest-review.sh: refusing ATTEST_REVIEW_LEVEL=\"${ATTEST_REVIEW_LEVEL}\" — use one of low|medium|high|xhigh|max (the /code-review effort level that ran)." >&2; exit 2 ;;
+  ''|low|medium|high|xhigh|max|max-fanout) ;;
+  *) echo "attest-review.sh: refusing ATTEST_REVIEW_LEVEL=\"${ATTEST_REVIEW_LEVEL}\" — use one of low|medium|high|xhigh|max|max-fanout (the review that ran)." >&2; exit 2 ;;
 esac
 common="$(git rev-parse --path-format=absolute --git-common-dir)"
 [ -n "$common" ] || { echo "error: not inside a git repository — cannot record attestation" >&2; exit 1; }
@@ -127,24 +128,25 @@ esac
 # and CI reuses a level-less review note (it rejects only waivers). The tier
 # is what this repo's push-review-gate.sh --tier --committed prints for HEAD:
 # the committed work only, since an unrelated dirty file is neither attested
-# nor pushed (max on any error: fail closed).
+# nor pushed (max-fanout on any error: fail closed). A critical-path diff
+# (tier max-fanout) attested with the one-agent max is refused here.
 tier=""
-tier_rank() { case "$1" in low) echo 1 ;; medium) echo 2 ;; high) echo 3 ;; xhigh) echo 4 ;; max) echo 5 ;; *) echo 5 ;; esac; }
+tier_rank() { case "$1" in low) echo 1 ;; medium) echo 2 ;; high) echo 3 ;; xhigh) echo 4 ;; max) echo 5 ;; max-fanout) echo 6 ;; *) echo 6 ;; esac; }
 diff_tier() {
   # stdin closed: an older copy of the hook reads a payload from stdin.
-  # No hook, no output or an error: max (fail closed).
+  # No hook, no output or an error: max-fanout (fail closed).
   local hook t
   hook="$(git rev-parse --show-toplevel 2>/dev/null)/.claude/hooks/push-review-gate.sh"
-  [ -f "$hook" ] || { echo max; return; }
-  t="$(bash "$hook" --tier --committed </dev/null 2>/dev/null)" || t=max
-  echo "${t:-max}"
+  [ -f "$hook" ] || { echo max-fanout; return; }
+  t="$(bash "$hook" --tier --committed </dev/null 2>/dev/null)" || t=max-fanout
+  echo "${t:-max-fanout}"
 }
 case "$verdict_lc" in
   waived-tests:*|blocked:*) ;;
   waived:*)
     tier="$(diff_tier)"
     if [ "$(tier_rank "$tier")" -gt 2 ]; then
-      echo "attest-review.sh: refusing — this diff's risk tier is $tier, so it cannot be waived (a waiver is only for a low or medium tier: prose docs, tests, listed data). Run /code-review $tier, then ATTEST_REVIEW_LEVEL=$tier." >&2
+      echo "attest-review.sh: refusing — this diff's risk tier is $tier, so it cannot be waived (a waiver is only for a low or medium tier: prose docs, tests, listed data). Run the $tier review (max: ONE opus-reviewer pass; max-fanout: /code-review max), then ATTEST_REVIEW_LEVEL=$tier." >&2
       exit 2
     fi ;;
   *)
@@ -155,7 +157,7 @@ case "$verdict_lc" in
     if [ -n "$review_level" ]; then
       tier="$(diff_tier)"
       if [ "$(tier_rank "$review_level")" -lt "$(tier_rank "$tier")" ]; then
-        echo "attest-review.sh: refusing — this diff's risk tier is $tier, so its /code-review must run at $tier or higher, not $review_level. Run /code-review $tier, then ATTEST_REVIEW_LEVEL=$tier." >&2
+        echo "attest-review.sh: refusing — this diff's risk tier is $tier, so its review must run at $tier or higher, not $review_level (max-fanout: a critical path needs the /code-review max finder fan-out, not one agent). Run the $tier review (max: ONE opus-reviewer pass; max-fanout: /code-review max), then ATTEST_REVIEW_LEVEL=$tier." >&2
         exit 2
       fi
     fi ;;

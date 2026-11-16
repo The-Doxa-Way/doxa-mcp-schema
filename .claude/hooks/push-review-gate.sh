@@ -88,45 +88,54 @@ kg_re='^(\.knowledge-graph-merkle\.json|\.knowledge-graph/)'
 code_re='(\.(c|m)?js|\.ts|\.tsx|\.sh|\.py|\.ya?ml)$|^\.claude/|^\.github/|^bin/|^scripts/|^fleet/|^config/|\.tmpl$|\.sql$|(^|/)(CLAUDE|AGENTS|SKILL)\.md$|(^|/)package(-lock)?\.json$'
 
 # REVIEW TIER (Garth 2026-11-14, "dial in" the max review; evals/factory
-# Experiment 1). The level the ONE pre-push `/code-review` must run at comes
-# from the changed paths alone (zero LLM), not from the author. It is an
-# ALLOWLIST: only the tested low-risk shapes get a lower level, and every
-# other path is max (the gate fails CLOSED, never open to a lower level):
+# Experiment 1; two max modes 2026-11-15, Experiment 4). The level the ONE
+# pre-push review must run at comes from the changed paths alone (zero LLM),
+# not from the author. It is an ALLOWLIST: only the tested low-risk shapes get
+# a lower level (the gate fails CLOSED, never open to a lower level):
 #   low     prose docs: .md/.mdx under docs/, specs/, handoffs/, proposals/,
 #           evals/ or goals/, and README.md / CHANGELOG.md anywhere.
 #   medium  tests (*.test.*, *.spec.*, __tests__/, test/, tests/, test_*.py),
 #           and data files (.json, .jsonl, .csv, .tsv, .yaml, .yml) under
 #           goals/_reports/, evals/, handoffs/, proposals/, scripts/data/,
-#           fixtures/ or results/.
-#   max     everything else: gates, hooks, workflows, config, instruction and
-#           canon files, product and app code, scripts, SQL, manifests. A path
-#           in tier_max_re, or a non-doc path that names money, auth,
-#           credentials, RLS/policy, security, safety or the encourager, is max
-#           even inside a low or medium folder.
+#           fixtures/ or results/ (a repo's maxTierPaths take a path back to
+#           max, e.g. shipped Scripture text in scripture-grounding-mcp).
+#   max     ONE opus-reviewer pass at max effort, no finder fan-out: every
+#           other path (instruction and canon files, config, product and app
+#           code, scripts, manifests, tier_max_re, maxTierPaths).
+#   max-fanout  the full `/code-review max` finder fan-out, ONLY for the
+#           critical set: a path in tier_fanout_re (the gate, hook, review and
+#           CI machinery, fleet gate config, SQL, migrations and schema) or a
+#           non-doc path that names money (payments, purchases, entitlement,
+#           pricing, paywall), auth or credentials, RLS/policy, security,
+#           user data, the encourager or its safety guards, or outbound sends
+#           (tier_kw_re), even inside a low or medium folder. A path that
+#           cannot be read (no path, a C-quoted name: git quotes a name with
+#           ", \ or a control byte) or any error is max-fanout.
 # The diff's tier is its highest file. KG state and generated paths do not
-# count (they are exempt above). No path, or a C-quoted path (git quotes a
-# name with ", \ or a control byte), is max. "high" is a valid review level
-# (it meets a low or medium tier) but no path tiers high: Experiment 1 tested
-# only medium against max. scripts/push-review-gate.test.mjs pins this.
+# count (they are exempt above). "high" is a valid review level (it meets a
+# low or medium tier) but no path tiers high: Experiment 1 tested only medium
+# against max. scripts/push-review-gate.test.mjs pins this.
 tier_max_re='^\.github/|^\.claude/|^agent-home/|^fleet/|^config/|^agents/|^learnings/|^ontology/|^authority/|^vault/00-MOCs/|(^|/)(CLAUDE|AGENTS|SKILL)\.md$|(^|/)skills/|(^|/)PROMPT[^/]*\.md$|-tick-prompt\.md$|^goals/[^/]+/GOAL\.md$|^goals/convert/experiments/|^docs/cns-reference\.md$|^docs/landing/|^evals/[^/]+/(rubric|judge|grader)|\.sql$'
-tier_kw_re='paywall|entitle|stripe|revenuecat|pricing|billing|subscri|checkout|purchase|payment|invoice|auth|login|passw|secret|credential|keychain|token|jwt|rls|polic|permission|secur|crypt|signing|signature|encourag|safety|moderat|crisis|age-?gate|consent|privacy|gdpr|outbound|send-mode'
+tier_fanout_re='^\.github/|^\.claude/hooks/|^agent-home/hooks/|(^|/)\.githooks/|(^|/)\.husky/|(^|/)user-hooks[^/]*$|(^|/)\.?gitleaks[^/]*$|^\.claude/settings[^/]*\.json$|^\.claude/agents/opus-reviewer\.md$|^\.claude/commands/(merge-to-main|merge-to-staging|recursive-quality-gate)\.md$|^fleet/gates/|^config/fleet\.ya?ml$|(^|/)protected-paths\.ya?ml$|(^|/)(attest-review|review-attest|review-preflight|land-prs)[^/]*$|^\.claude/agents/[^/]*review[^/]*\.md$|^\.claude/commands/[^/]*review[^/]*\.md$|^goals/convert/experiments/|^learnings/policy\.ya?ml$|^goals/evidence-policy\.ya?ml$|^scripts/(lib/)?(loop-ledger|evidence-contract|evidence-verify|experiment-contract|goal-grader|experiment-grader|experiment-validate|cns-push-mode|cns-push)\.[cm]?js$|^scripts/cron/cns-push\.js$|\.sql$|(^|/)migrations?/|(^|/)schema[^/]*\.(sql|prisma)$'
+tier_kw_re='(^|[/_.-])gates?([/_.-]|$)|paywall|premium|entitle|stripe|revenuecat|(^|[^a-z])iap([^a-z]|$)|receipt|storekit|play-?billing|server-notifications|play-notifications|portal-session|pricing|billing|subscri|checkout|purchase|payment|invoice|auth([^o]|o[^r]|$)|login|passw|secret|credential|keychain|token|jwt|api-?key|mcp-key|(^|[^a-z])rls([^a-z]|$)|polic|permission|secur|crypt|signing|signature|encourag|safety|moderat|crisis|age-?gate|consent|privacy|gdpr|outbound|send-mode|email|mailer|outreach|nurture|user[-_]?data|personal[-_]?data|(^|[^a-z])pii|delete[-_]?account|account[-_]?deletion|data[-_]?export|export[-_]?(data|account)|(^|/)config\.toml$'
+tier_extra_max_re=''
 tier_doc_re='^(docs|specs|handoffs|proposals|evals|goals)/.*\.mdx?$|(^|/)(README|CHANGELOG)\.md$'
 tier_medium_re='\.(test|spec)\.[cm]?[jt]sx?$|(^|/)(__tests__|tests?)/|(^|/)test_[^/]+\.py$|^(goals/_reports|evals|handoffs|proposals|scripts/data)/.*\.(json|jsonl|csv|tsv|ya?ml)$|(^|/)(fixtures|results)/.*\.(json|jsonl|csv|tsv|ya?ml)$'
 
-# level_rank <level>: low 1 … max 5; anything else 0.
+# level_rank <level>: low 1 … max 5, max-fanout 6; anything else 0.
 level_rank() {
-  case "$1" in low) echo 1 ;; medium) echo 2 ;; high) echo 3 ;; xhigh) echo 4 ;; max) echo 5 ;; *) echo 0 ;; esac
+  case "$1" in low) echo 1 ;; medium) echo 2 ;; high) echo 3 ;; xhigh) echo 4 ;; max) echo 5 ;; max-fanout) echo 6 ;; *) echo 0 ;; esac
 }
 
-# review_tier: reads changed paths on stdin; prints low|medium|high|max.
+# review_tier: reads changed paths on stdin; prints low|medium|high|max|max-fanout.
 # KG state and generated paths (not authored ones) are skipped; only such
-# paths = low (nothing to review). No path at all = max.
+# paths = low (nothing to review). No path at all = max-fanout.
 review_tier() {
-  MAX_RE="$tier_max_re" KW_RE="$tier_kw_re" DOC_RE="$tier_doc_re" MED_RE="$tier_medium_re" \
+  FAN_RE="$tier_fanout_re" MAX_RE="$tier_max_re" XMAX_RE="$tier_extra_max_re" KW_RE="$tier_kw_re" DOC_RE="$tier_doc_re" MED_RE="$tier_medium_re" \
   GEN_RE="$gen_re" AUTH_RE="$authored_re" KG_RE="$kg_re" awk '
-    function rank(t) { return t == "max" ? 5 : t == "high" ? 3 : t == "medium" ? 2 : t == "low" ? 1 : 0 }
+    function rank(t) { return t == "max-fanout" ? 6 : t == "max" ? 5 : t == "high" ? 3 : t == "medium" ? 2 : t == "low" ? 1 : 0 }
     /^$/ { next }
-    /^"/ { n++; best = "max"; next }
+    /^"/ { n++; best = "max-fanout"; next }
     {
       p = $0; sub(/^\.\//, "", p)
       authored = (ENVIRON["AUTH_RE"] != "" && p ~ ENVIRON["AUTH_RE"])
@@ -134,13 +143,14 @@ review_tier() {
       if (!authored && ENVIRON["GEN_RE"] != "" && p ~ ENVIRON["GEN_RE"]) { k++; next }
       n++
       doc = (p ~ ENVIRON["DOC_RE"])
-      if (p ~ ENVIRON["MAX_RE"] || (!doc && tolower(p) ~ ENVIRON["KW_RE"])) t = "max"
+      if (p ~ ENVIRON["FAN_RE"] || (!doc && (tolower(p) ~ ENVIRON["KW_RE"] || p ~ /[a-z]Gates?([A-Z._-]|$)/))) t = "max-fanout"
+      else if (p ~ ENVIRON["MAX_RE"] || (ENVIRON["XMAX_RE"] != "" && p ~ ENVIRON["XMAX_RE"])) t = "max"
       else if (doc) t = "low"
       else if (p ~ ENVIRON["MED_RE"]) t = "medium"
       else t = "max"
       if (rank(t) > rank(best)) best = t
     }
-    END { print (n > 0 && best != "") ? best : (n == 0 && k > 0) ? "low" : "max" }'
+    END { print (n > 0 && best != "") ? best : (n == 0 && k > 0) ? "low" : "max-fanout" }'
 }
 
 
@@ -174,7 +184,7 @@ log_decision() {   # log_decision <common> <decision> <sha> <ref> <detail>
 # exempt_filter: reads `git log --no-merges --format=%x1e%H%x1f%s --name-only`
 # on stdin; prints the SHAs of the commits that are NOT exempt.
 exempt_filter() {
-  RS1="$(printf '\036')" US1="$(printf '\037')" CODE_RE="$code_re" GEN_RE="$gen_re" AUTH_RE="$authored_re" EXEMPT_RE="$exempt_re" KG_RE="$kg_re" awk '
+  RS1="$(printf '\036')" US1="$(printf '\037')" CODE_RE="$code_re" FAN_RE="$tier_fanout_re" GEN_RE="$gen_re" AUTH_RE="$authored_re" EXEMPT_RE="$exempt_re" KG_RE="$kg_re" awk '
     function flush() {
       if (sha == "") return
       if (code) print sha
@@ -189,7 +199,7 @@ exempt_filter() {
       if (ENVIRON["AUTH_RE"] != "" && $0 ~ ENVIRON["AUTH_RE"]) { code = 1; next }
       if ($0 ~ ENVIRON["KG_RE"]) next
       if (ENVIRON["GEN_RE"] != "" && $0 ~ ENVIRON["GEN_RE"]) next
-      if (ENVIRON["EXEMPT_RE"] != "" && subj ~ ENVIRON["EXEMPT_RE"] && $0 !~ ENVIRON["CODE_RE"]) next
+      if (ENVIRON["EXEMPT_RE"] != "" && subj ~ ENVIRON["EXEMPT_RE"] && $0 !~ ENVIRON["CODE_RE"] && $0 !~ ENVIRON["FAN_RE"]) next
       code = 1
     }
     END { flush() }'
@@ -201,9 +211,9 @@ exempt_filter() {
 qualifying_shas() {
   local ledger="$1/review-attest.jsonl"
   [ -f "$ledger" ] || return 0
-  jq -R -r --argjson need "${2:-5}" 'fromjson? | select(type == "object" and (.sha | type) == "string" and (.verdict | type) == "string")
+  jq -R -r --argjson need "${2:-6}" 'fromjson? | select(type == "object" and (.sha | type) == "string" and (.verdict | type) == "string")
     | (.verdict | ascii_downcase) as $v
-    | ({"low":1,"medium":2,"high":3,"xhigh":4,"max":5}[(.review_level // "") | tostring | ascii_downcase] // 0) as $r
+    | ({"low":1,"medium":2,"high":3,"xhigh":4,"max":5,"max-fanout":6}[(.review_level // "") | tostring | ascii_downcase] // 0) as $r
     | select(($v | startswith("waived-tests:")) | not)
     | select(($v | startswith("blocked:")) | not)
     | ($v | startswith("waived:")) as $w
@@ -259,12 +269,12 @@ uncovered_commits() {
 # own (low) level. Sound: a lower level is only ever asked for once every
 # commit at a higher tier is covered.
 cover_rounds() {
-  local prev=6 quals added c
+  local prev=7 quals added c
   while :; do
     # shellcheck disable=SC2086
     tier="$(commit_files "$d" $uncovered | review_tier)"
     need="$(level_rank "$tier")"
-    [ "$need" -gt 0 ] || { tier=max; need=5; }
+    [ "$need" -gt 0 ] || { tier=max-fanout; need=6; }
     [ "$need" -lt "$prev" ] || return 1
     prev="$need"
     # New commits that hold a qualifying attestation (and no block).
@@ -325,8 +335,12 @@ check_sha() {
       [ -n "$c" ] && echo "    $(git -C "$d" log -1 --format='%h %s' "$c" 2>/dev/null)"
     done
     echo
-    echo "Standing order (Garth 2026-11-11, tiered 2026-11-14): ONE /code-review pass at the diff's tier on the final diff, at most one fix round, then attest and push:"
-    echo "  /code-review $tier → fix round → ATTEST_REVIEW_LEVEL=$tier $attest_cmd \"clean\"   (or \"findings-fixed: <summary>\")"
+    echo "Standing order (Garth 2026-11-11, tiered 2026-11-14, two max modes 2026-11-15): ONE review pass at the diff's tier on the final diff, at most one fix round, then attest and push:"
+    case "$tier" in
+      max-fanout) echo "  /code-review max (the finder fan-out: this diff touches a critical path) → fix round → ATTEST_REVIEW_LEVEL=max-fanout $attest_cmd \"clean\"   (or \"findings-fixed: <summary>\")" ;;
+      max) echo "  ONE opus-reviewer Agent pass (its effort is max; prompt starts \"review-mode max <worktree>\"), no /code-review fan-out → fix round → ATTEST_REVIEW_LEVEL=max $attest_cmd \"clean\"   (or \"findings-fixed: <summary>\")" ;;
+      *) echo "  /code-review $tier → fix round → ATTEST_REVIEW_LEVEL=$tier $attest_cmd \"clean\"   (or \"findings-fixed: <summary>\")" ;;
+    esac
     if [ "$need" -le 2 ]; then
       echo "No code (docs or data only)? Log an explicit waiver: $attest_cmd \"waived: docs-only: <reason>\""
     fi
@@ -353,7 +367,7 @@ check_pending_commit() {
   if printf '\036%s\037pending\n%s\n' 0000000 "$files" | exempt_filter | grep -q .; then
     {
       echo "⛔ push-review-gate — this command commits and then pushes, so the new commit cannot have a review attestation yet."
-      echo "Commit first, then ONE /code-review <tier> on the final diff (tier: bash .claude/hooks/push-review-gate.sh --tier) → ATTEST_REVIEW_LEVEL=<tier> scripts/attest-review.sh \"clean\" → push as its own command."
+      echo "Commit first, then ONE review at the tier on the final diff (tier: bash .claude/hooks/push-review-gate.sh --tier; max = one opus-reviewer pass, max-fanout = /code-review max) → ATTEST_REVIEW_LEVEL=<tier> scripts/attest-review.sh \"clean\" → push as its own command."
     } >&2
     return 2
   fi
@@ -467,37 +481,37 @@ GITQ=(-c core.quotePath=false -c diff.relative=false -c log.showRoot=true -c dif
 # origin/<integration|prod> (or <base-ref>) and not yet covered by an
 # attestation, by the same rounds the gate applies, and of any uncommitted or
 # untracked file (the higher wins; `--committed` leaves those out, for
-# attest-review.sh). Nothing left to review: low. Any error: max. `--tier-paths`: the tier of the paths read on stdin.
+# attest-review.sh). Nothing left to review: low. Any error: max-fanout. `--tier-paths`: the tier of the paths read on stdin.
 # Loops call this to pick the /code-review level; attest-review.sh calls it to
 # refuse a level below it (or a waiver above medium); the gate enforces it.
 if [ "${1:-}" = --tier ] || [ "${1:-}" = --tier-paths ]; then
   if [ "$1" = --tier-paths ]; then review_tier; exit 0; fi
-  d="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo max; exit 0; }
-  common="$(git -C "$d" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || { echo max; exit 0; }
-  sha="$(git -C "$d" rev-parse -q --verify HEAD 2>/dev/null)" || { echo max; exit 0; }
+  d="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo max-fanout; exit 0; }
+  common="$(git -C "$d" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || { echo max-fanout; exit 0; }
+  sha="$(git -C "$d" rev-parse -q --verify HEAD 2>/dev/null)" || { echo max-fanout; exit 0; }
   nots=() base="" committed=0
   for a in "${@:2}"; do
     case "$a" in --committed) committed=1 ;; *) base="$a" ;; esac
   done
   if [ -n "$base" ]; then
-    git -C "$d" rev-parse -q --verify "$base" >/dev/null 2>&1 || { echo max; exit 0; }
+    git -C "$d" rev-parse -q --verify "$base" >/dev/null 2>&1 || { echo max-fanout; exit 0; }
     nots+=("$base")
   else
     for b in "$integration_branch" "$prod_branch"; do
       [ -n "$b" ] && git -C "$d" rev-parse -q --verify "refs/remotes/origin/$b" >/dev/null 2>&1 && nots+=("refs/remotes/origin/$b")
     done
   fi
-  [ "${#nots[@]}" -gt 0 ] || { echo max; exit 0; }
+  [ "${#nots[@]}" -gt 0 ] || { echo max-fanout; exit 0; }
   # Work not committed yet counts too: a loop may ask before it commits.
-  dirty="$( { git -C "$d" "${GITQ[@]}" diff --name-only HEAD && git -C "$d" ls-files --others --exclude-standard; } 2>/dev/null)" || { echo max; exit 0; }
+  dirty="$( { git -C "$d" "${GITQ[@]}" diff --name-only HEAD && git -C "$d" ls-files --others --exclude-standard; } 2>/dev/null)" || { echo max-fanout; exit 0; }
   t_dirty=""
   [ -n "$dirty" ] && [ "$committed" -eq 0 ] && t_dirty="$(printf '%s\n' "$dirty" | review_tier)"
   t_commits=low
-  new="$(git -C "$d" rev-list "$sha" --not "${nots[@]}" 2>/dev/null)" || { echo max; exit 0; }
+  new="$(git -C "$d" rev-list "$sha" --not "${nots[@]}" 2>/dev/null)" || { echo max-fanout; exit 0; }
   if [ -n "$new" ]; then
     uncovered="$(uncovered_commits "$d" "$sha" "${nots[@]}")"
     attested=()
-    if [ -n "$uncovered" ] && ! cover_rounds; then t_commits="${tier:-max}"; fi
+    if [ -n "$uncovered" ] && ! cover_rounds; then t_commits="${tier:-max-fanout}"; fi
   fi
   if [ -n "$t_dirty" ] && [ "$(level_rank "$t_dirty")" -gt "$(level_rank "$t_commits")" ]; then echo "$t_dirty"; else echo "$t_commits"; fi
   exit 0
